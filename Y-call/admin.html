@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 페이지 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #0F172A; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* LAYOUT */
+    .admin-wrap { display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .admin-sidebar {
+      width: 240px; background: #1E293B; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+      overflow-y: auto;
+    }
+    .admin-logo {
+      padding: 24px 20px; border-bottom: 1px solid #334155;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .admin-logo-icon {
+      width: 36px; height: 36px; background: var(--primary);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .admin-logo-text { font-size: 1.125rem; font-weight: 800; color: white; }
+    .admin-logo-badge { font-size: 0.6875rem; background: #EF4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+    .sidebar-section { padding: 16px 12px 8px; }
+    .sidebar-section-label { font-size: 0.6875rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 8px; margin-bottom: 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 500; color: #94A3B8;
+      transition: all 0.15s; margin-bottom: 2px;
+    }
+    .sidebar-item:hover { background: #334155; color: #E2E8F0; }
+    .sidebar-item.active { background: var(--primary); color: white; }
+    .sidebar-item-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-badge {
+      margin-left: auto; background: #EF4444; color: white;
+      font-size: 0.6875rem; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+    }
+
+    /* MAIN */
+    .admin-main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; }
+
+    /* TOP BAR */
+    .admin-topbar {
+      background: #1E293B; border-bottom: 1px solid #334155;
+      padding: 0 28px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 99;
+    }
+    .topbar-title { font-size: 1.0625rem; font-weight: 700; color: white; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .topbar-admin { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: #94A3B8; }
+    .topbar-admin-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700; color: white;
+    }
+    .topbar-btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 0.8125rem; font-weight: 600;
+      cursor: pointer; border: 1px solid #334155; background: #334155; color: #94A3B8; font-family: inherit;
+      transition: all 0.15s;
+    }
+    .topbar-btn:hover { background: #475569; color: white; }
+
+    /* CONTENT */
+    .admin-content { padding: 28px; flex: 1; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .section-title { font-size: 1.375rem; font-weight: 800; color: white; margin-bottom: 6px; }
+    .section-sub { font-size: 0.9375rem; color: #64748B; margin-bottom: 28px; }
+
+    /* STAT CARDS */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: #1E293B; border-radius: 12px; border: 1px solid #334155; padding: 20px 22px;
+    }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .stat-card-label { font-size: 0.8125rem; color: #64748B; font-weight: 600; }
+    .stat-card-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .icon-blue { background: rgba(99,102,241,0.15); }
+    .icon-green { background: rgba(16,185,129,0.15); }
+    .icon-amber { background: rgba(245,158,11,0.15); }
+    .icon-red { background: rgba(239,68,68,0.15); }
+    .stat-card-val { font-size: 1.875rem; font-weight: 800; color: white; }
+    .stat-card-change { font-size: 0.8125rem; font-weight: 600; margin-top: 6px; }
+    .up { color: #10B981; }
+    .down { color: #EF4444; }
+
+    /* CHART AREA */
+    .chart-card { background: #1E293B; border-radius: 12px; border: 1px solid #334155; padding: 24px; margin-bottom: 24px; }
+    .chart-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .chart-card-title { font-size: 1rem; font-weight: 700; color: white; }
+    .chart-tabs { display: flex; gap: 4px; }
+    .chart-tab {
+      padding: 6px 14px; border-radius: 6px; font-size: 0.8125rem; font-weight: 600;
+      cursor: pointer; color: #64748B; transition: all 0.15s; border: none; background: none; font-family: inherit;
+    }
+    .chart-tab.active { background: var(--primary); color: white; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .bar { width: 100%; border-radius: 6px 6px 0 0; transition: all 0.3s; cursor: pointer; }
+    .bar-revenue { background: linear-gradient(180deg, #7C3AED, #5B21B6); }
+    .bar-calls { background: linear-gradient(180deg, #10B981, #059669); }
+    .bar:hover { opacity: 0.8; }
+    .bar-label { font-size: 0.6875rem; color: #64748B; }
+    .bar-val { font-size: 0.6875rem; color: #94A3B8; font-weight: 600; }
+
+    /* TABLE */
+    .table-card { background: #1E293B; border-radius: 12px; border: 1px solid #334155; overflow: hidden; margin-bottom: 24px; }
+    .table-header { padding: 18px 22px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+    .table-title { font-size: 1rem; font-weight: 700; color: white; }
+    .table-search {
+      padding: 8px 14px; background: #0F172A; border: 1px solid #334155;
+      border-radius: 8px; font-size: 0.875rem; color: #E2E8F0; outline: none; font-family: inherit;
+      width: 220px;
+    }
+    .table-search::placeholder { color: #475569; }
+    .table-search:focus { border-color: var(--primary); }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #0F172A; }
+    th { padding: 12px 16px; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+    td { padding: 14px 16px; font-size: 0.9rem; color: #CBD5E1; border-bottom: 1px solid #1E293B; }
+    tbody tr { transition: background 0.1s; }
+    tbody tr:hover { background: #0F172A; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* BADGES */
+    .tbadge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+    .tbadge-green { background: rgba(16,185,129,0.15); color: #10B981; }
+    .tbadge-amber { background: rgba(245,158,11,0.15); color: #F59E0B; }
+    .tbadge-red { background: rgba(239,68,68,0.15); color: #EF4444; }
+    .tbadge-blue { background: rgba(99,102,241,0.15); color: #818CF8; }
+    .tbadge-gray { background: rgba(100,116,139,0.15); color: #64748B; }
+
+    /* ACTION BUTTONS */
+    .action-btns { display: flex; gap: 6px; }
+    .action-btn {
+      padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; border: none; font-family: inherit; transition: all 0.15s;
+    }
+    .action-btn-approve { background: rgba(16,185,129,0.15); color: #10B981; }
+    .action-btn-approve:hover { background: #10B981; color: white; }
+    .action-btn-reject { background: rgba(239,68,68,0.15); color: #EF4444; }
+    .action-btn-reject:hover { background: #EF4444; color: white; }
+    .action-btn-view { background: rgba(99,102,241,0.15); color: #818CF8; }
+    .action-btn-view:hover { background: #7C3AED; color: white; }
+    .action-btn-warn { background: rgba(245,158,11,0.15); color: #F59E0B; }
+    .action-btn-warn:hover { background: #F59E0B; color: white; }
+    .action-btn-block { background: rgba(239,68,68,0.1); color: #EF4444; }
+    .action-btn-block:hover { background: #EF4444; color: white; }
+
+    /* MINI STATS ROW */
+    .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .mini-stat { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; }
+    .mini-stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .mini-stat-label { font-size: 0.8125rem; color: #64748B; }
+    .mini-stat-val { font-size: 1.375rem; font-weight: 800; color: white; }
+
+    /* PAGINATION */
+    .tbl-footer { padding: 14px 22px; border-top: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+    .tbl-count { font-size: 0.875rem; color: #64748B; }
+    .page-btns { display: flex; gap: 4px; }
+    .pbtn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #334155; background: #0F172A; color: #94A3B8; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.15s; }
+    .pbtn:hover { border-color: var(--primary); color: var(--primary); }
+    .pbtn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+    /* FILTER ROW */
+    .filter-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn { padding: 7px 16px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; border: 1px solid #334155; background: #1E293B; color: #64748B; font-family: inherit; transition: all 0.15s; }
+    .filter-btn:hover { border-color: #475569; color: #94A3B8; }
+    .filter-btn.active { border-color: var(--primary); background: rgba(124,58,237,0.15); color: #A78BFA; }
+
+    /* NOTICE CARD */
+    .notice-card { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .notice-card p { font-size: 0.9rem; color: #A78BFA; }
+
+    /* REPORT ITEM */
+    .report-item { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+    .report-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .report-severity { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+    .sev-high { background: rgba(239,68,68,0.15); color: #EF4444; }
+    .sev-mid { background: rgba(245,158,11,0.15); color: #F59E0B; }
+    .sev-low { background: rgba(100,116,139,0.15); color: #64748B; }
+    .report-title { font-size: 0.9375rem; font-weight: 700; color: white; }
+    .report-desc { font-size: 0.875rem; color: #64748B; line-height: 1.6; margin-bottom: 14px; }
+    .report-meta { font-size: 0.8125rem; color: #475569; }
+
+    /* SETTLE ITEMS */
+    .settle-item { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 18px 22px; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; }
+    .settle-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .settle-info { flex: 1; }
+    .settle-name { font-size: 0.9375rem; font-weight: 700; color: white; }
+    .settle-meta { font-size: 0.8125rem; color: #64748B; margin-top: 2px; }
+    .settle-amount { font-size: 1.125rem; font-weight: 800; color: #10B981; white-space: nowrap; }
+
+    /* LOGIN */
+    .admin-login {
+      position: fixed; inset: 0; background: #0F172A;
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .login-box {
+      background: #1E293B; border: 1px solid #334155; border-radius: 16px;
+      padding: 48px 40px; width: 100%; max-width: 400px;
+    }
+    .login-box h2 { font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 6px; }
+    .login-box p { font-size: 0.9375rem; color: #64748B; margin-bottom: 32px; }
+    .dark-input {
+      width: 100%; padding: 12px 16px; background: #0F172A; border: 1.5px solid #334155;
+      border-radius: 8px; font-size: 0.9375rem; color: #E2E8F0; outline: none; font-family: inherit;
+      transition: all 0.15s; margin-bottom: 12px;
+    }
+    .dark-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.2); }
+    .dark-input::placeholder { color: #475569; }
+    .login-btn {
+      width: 100%; padding: 13px; background: var(--primary); color: white;
+      border: none; border-radius: 8px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; margin-top: 4px;
+    }
+    .login-btn:hover { background: #6D28D9; }
+    .login-hint { font-size: 0.8125rem; color: #475569; text-align: center; margin-top: 16px; }
+
+    @media (max-width: 1024px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .mini-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar { display: none; }
+      .admin-main { margin-left: 0; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN LOGIN -->
+  <div class="admin-login" id="admin-login">
+    <div class="login-box">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🔐</div>
+      <h2>관리자 로그인</h2>
+      <p>Y-Call 관리자 전용 페이지입니다</p>
+      <input type="text" class="dark-input" id="admin-id" placeholder="관리자 아이디" value="admin">
+      <input type="password" class="dark-input" id="admin-pw" placeholder="비밀번호" value="1234">
+      <button class="login-btn" onclick="adminLogin()">로그인</button>
+      <p class="login-hint">데모: admin / 1234</p>
+    </div>
+  </div>
+
+  <div class="admin-wrap" id="admin-app" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-icon">📞</div>
+        <div>
+          <div class="admin-logo-text">Y-Call</div>
+        </div>
+        <div class="admin-logo-badge">ADMIN</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">메인</div>
+        <div class="sidebar-item active" onclick="showSection('overview', this)"><span class="sidebar-item-icon">📊</span> 대시보드</div>
+        <div class="sidebar-item" onclick="showSection('stats', this)"><span class="sidebar-item-icon">📈</span> 통계/매출</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">사용자</div>
+        <div class="sidebar-item" onclick="showSection('users', this)"><span class="sidebar-item-icon">👥</span> 회원 관리</div>
+        <div class="sidebar-item" onclick="showSection('experts', this)"><span class="sidebar-item-icon">⭐</span> 전문가 관리</div>
+        <div class="sidebar-item" onclick="showSection('approve', this)">
+          <span class="sidebar-item-icon">✅</span> 전문가 승인
+          <span class="sidebar-badge">3</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">운영</div>
+        <div class="sidebar-item" onclick="showSection('calls', this)"><span class="sidebar-item-icon">📞</span> 상담 내역</div>
+        <div class="sidebar-item" onclick="showSection('settle', this)"><span class="sidebar-item-icon">💰</span> 정산 관리</div>
+        <div class="sidebar-item" onclick="showSection('reports', this)">
+          <span class="sidebar-item-icon">🚨</span> 신고 관리
+          <span class="sidebar-badge">2</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">시스템</div>
+        <div class="sidebar-item" onclick="showSection('notice', this)"><span class="sidebar-item-icon">📢</span> 공지사항</div>
+        <div class="sidebar-item" onclick="showSection('settings', this)"><span class="sidebar-item-icon">⚙️</span> 설정</div>
+        <div class="sidebar-item" onclick="adminLogout()"><span class="sidebar-item-icon">🚪</span> 로그아웃</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <!-- TOPBAR -->
+      <div class="admin-topbar">
+        <div class="topbar-title" id="topbar-title">대시보드</div>
+        <div class="topbar-right">
+          <div style="font-size:0.875rem;color:#64748B;" id="topbar-date"></div>
+          <div class="topbar-admin">
+            <div class="topbar-admin-avatar">A</div>
+            <span>관리자</span>
+          </div>
+          <button class="topbar-btn" onclick="location.href='index.html'">← 사이트 보기</button>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="admin-content">
+
+        <!-- ===== OVERVIEW ===== -->
+        <div class="section active" id="section-overview">
+          <div class="section-title">대시보드</div>
+          <div class="section-sub">Y-Call 플랫폼 현황을 한눈에 확인하세요</div>
+
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <div class="stat-card-label">총 매출 (이번달)</div>
+                <div class="stat-card-icon icon-blue">💰</div>
+              </div>
+              <div class="stat-card-val">24,830,000</div>
+              <div class="stat-card-change up">▲ 18.4% 지난달 대비</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <div class="stat-card-label">총 회원 수</div>
+                <div class="stat-card-icon icon-green">👥</div>
+              </div>
+              <div class="stat-card-val">52,841</div>
+              <div class="stat-card-change up">▲ 1,234명 신규 가입</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <div class="stat-card-label">총 상담 건수 (이번달)</div>
+                <div class="stat-card-icon icon-amber">📞</div>
+              </div>
+              <div class="stat-card-val">8,472</div>
+              <div class="stat-card-change up">▲ 12.7% 증가</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <div class="stat-card-label">등록 전문가 수</div>
+                <div class="stat-card-icon icon-red">⭐</div>
+              </div>
+              <div class="stat-card-val">1,823</div>
+              <div class="stat-card-change up">▲ 23명 신규 등록</div>
+            </div>
+          </div>
+
+          <!-- Revenue Chart -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">📈 월별 매출 추이</div>
+              <div class="chart-tabs">
+                <button class="chart-tab active" onclick="switchChart(this,'revenue')">매출</button>
+                <button class="chart-tab" onclick="switchChart(this,'calls')">상담 건수</button>
+              </div>
+            </div>
+            <div class="bar-chart" id="main-chart"></div>
+            <div style="display:flex;gap:24px;margin-top:16px;font-size:0.8125rem;color:#64748B;justify-content:flex-end;">
+              <span>단위: 만원</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <!-- 최근 가입 -->
+            <div class="table-card">
+              <div class="table-header">
+                <div class="table-title">🆕 최근 가입 회원</div>
+              </div>
+              <table>
+                <thead><tr>
+                  <th>이름</th><th>가입일</th><th>상태</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td>김○○</td><td>2026-06-20</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
+                  <tr><td>이○○</td><td>2026-06-20</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
+                  <tr><td>박○○</td><td>2026-06-19</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
+                  <tr><td>최○○</td><td>2026-06-19</td><td><span class="tbadge tbadge-amber">인증 대기</span></td></tr>
+                  <tr><td>정○○</td><td>2026-06-18</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- 승인 대기 -->
+            <div class="table-card">
+              <div class="table-header">
+                <div class="table-title">⏳ 승인 대기 전문가</div>
+              </div>
+              <table>
+                <thead><tr>
+                  <th>이름</th><th>분야</th><th>처리</th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td>강○○</td><td>법률</td>
+                    <td><div class="action-btns">
+                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'강○○')">승인</button>
+                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
+                    </div></td>
+                  </tr>
+                  <tr>
+                    <td>윤○○</td><td>세무</td>
+                    <td><div class="action-btns">
+                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'윤○○')">승인</button>
+                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
+                    </div></td>
+                  </tr>
+                  <tr>
+                    <td>오○○</td><td>IT/개발</td>
+                    <td><div class="action-btns">
+                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'오○○')">승인</button>
+                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
+                    </div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="section" id="section-stats">
+          <div class="section-title">통계 / 매출</div>
+          <div class="section-sub">상세 통계 데이터를 확인하세요</div>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-blue">💵</div>
+              <div><div class="mini-stat-label">오늘 매출</div><div class="mini-stat-val">1,240,000원</div></div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-green">📞</div>
+              <div><div class="mini-stat-label">오늘 상담 건수</div><div class="mini-stat-val">312건</div></div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-amber">⭐</div>
+              <div><div class="mini-stat-label">오늘 평균 평점</div><div class="mini-stat-val">4.87</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">📊 일별 매출 (최근 30일)</div>
+              <select style="background:#0F172A;border:1px solid #334155;color:#94A3B8;padding:6px 12px;border-radius:6px;font-family:inherit;font-size:0.875rem;outline:none;">
+                <option>최근 30일</option><option>최근 7일</option><option>이번 달</option>
+              </select>
+            </div>
+            <div class="bar-chart" id="daily-chart"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="chart-card">
+              <div class="chart-card-header"><div class="chart-card-title">🎯 분야별 상담 비율</div></div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;" id="category-stats"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header"><div class="chart-card-title">📱 시간대별 상담 분포</div></div>
+              <div class="bar-chart" id="hourly-chart" style="height:120px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USERS ===== -->
+        <div class="section" id="section-users">
+          <div class="section-title">회원 관리</div>
+          <div class="section-sub">전체 가입 회원을 조회하고 관리합니다</div>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterUsers(this,'all')">전체 (52,841)</button>
+            <button class="filter-btn" onclick="filterUsers(this,'active')">활성 (51,203)</button>
+            <button class="filter-btn" onclick="filterUsers(this,'inactive')">비활성 (1,432)</button>
+            <button class="filter-btn" onclick="filterUsers(this,'blocked')">정지 (206)</button>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">회원 목록</div>
+              <input type="text" class="table-search" placeholder="🔍 이름, 이메일 검색...">
+            </div>
+            <table>
+              <thead><tr>
+                <th>ID</th><th>이름</th><th>이메일</th><th>가입일</th><th>상담 횟수</th><th>총 결제</th><th>상태</th><th>관리</th>
+              </tr></thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+            <div class="tbl-footer">
+              <div class="tbl-count">총 52,841명 | 1-10 표시중</div>
+              <div class="page-btns">
+                <button class="pbtn">‹</button>
+                <button class="pbtn active">1</button>
+                <button class="pbtn">2</button>
+                <button class="pbtn">3</button>
+                <button class="pbtn">›</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== EXPERTS ===== -->
+        <div class="section" id="section-experts">
+          <div class="section-title">전문가 관리</div>
+          <div class="section-sub">등록된 전문가를 조회하고 관리합니다</div>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterBtn(this)">전체 (1,823)</button>
+            <button class="filter-btn" onclick="filterBtn(this)">인증 완료 (1,456)</button>
+            <button class="filter-btn" onclick="filterBtn(this)">임시 등록 (367)</button>
+            <button class="filter-btn" onclick="filterBtn(this)">정지 (12)</button>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">전문가 목록</div>
+              <input type="text" class="table-search" placeholder="🔍 이름, 분야 검색...">
+            </div>
+            <table>
+              <thead><tr>
+                <th>이름</th><th>분야</th><th>분당 요금</th><th>상담 건수</th><th>평점</th><th>이번달 수익</th><th>상태</th><th>관리</th>
+              </tr></thead>
+              <tbody id="experts-tbody"></tbody>
+            </table>
+            <div class="tbl-footer">
+              <div class="tbl-count">총 1,823명</div>
+              <div class="page-btns">
+                <button class="pbtn">‹</button>
+                <button class="pbtn active">1</button>
+                <button class="pbtn">2</button>
+                <button class="pbtn">›</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== APPROVE ===== -->
+        <div class="section" id="section-approve">
+          <div class="section-title">전문가 승인</div>
+          <div class="section-sub">전문가 등록 신청을 검토하고 승인/거절합니다</div>
+          <div class="notice-card">
+            <span style="font-size:1.2rem;">📋</span>
+            <p>현재 <strong style="color:#A78BFA;">3건</strong>의 승인 대기 중인 전문가 신청이 있습니다.</p>
+          </div>
+          <div id="approve-list"></div>
+        </div>
+
+        <!-- ===== CALLS ===== -->
+        <div class="section" id="section-calls">
+          <div class="section-title">상담 내역</div>
+          <div class="section-sub">전체 통화 상담 내역을 조회합니다</div>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterBtn(this)">전체</button>
+            <button class="filter-btn" onclick="filterBtn(this)">완료</button>
+            <button class="filter-btn" onclick="filterBtn(this)">진행 중</button>
+            <button class="filter-btn" onclick="filterBtn(this)">취소</button>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">상담 목록</div>
+              <input type="text" class="table-search" placeholder="🔍 사용자, 전문가 검색...">
+            </div>
+            <table>
+              <thead><tr>
+                <th>ID</th><th>사용자</th><th>전문가</th><th>분야</th><th>시간</th><th>결제금액</th><th>날짜</th><th>상태</th>
+              </tr></thead>
+              <tbody id="calls-tbody"></tbody>
+            </table>
+            <div class="tbl-footer">
+              <div class="tbl-count">총 8,472건</div>
+              <div class="page-btns">
+                <button class="pbtn">‹</button>
+                <button class="pbtn active">1</button>
+                <button class="pbtn">2</button>
+                <button class="pbtn">3</button>
+                <button class="pbtn">›</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SETTLE ===== -->
+        <div class="section" id="section-settle">
+          <div class="section-title">정산 관리</div>
+          <div class="section-sub">전문가 수익 정산을 처리합니다</div>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-amber">⏳</div>
+              <div><div class="mini-stat-label">정산 대기</div><div class="mini-stat-val">14,280,000원</div></div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-green">✅</div>
+              <div><div class="mini-stat-label">이번달 정산 완료</div><div class="mini-stat-val">18,920,000원</div></div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon icon-blue">📋</div>
+              <div><div class="mini-stat-label">정산 신청 대기</div><div class="mini-stat-val">47건</div></div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">정산 신청 목록</div>
+              <div style="display:flex;gap:8px;">
+                <button class="action-btn action-btn-approve" style="padding:8px 16px;font-size:0.875rem;" onclick="bulkSettle()">전체 승인</button>
+                <input type="text" class="table-search" placeholder="🔍 전문가 검색..." style="width:180px;">
+              </div>
+            </div>
+            <div style="padding:8px 0;" id="settle-list"></div>
+            <div class="tbl-footer">
+              <div class="tbl-count">총 47건 · 미지급 합계 14,280,000원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== REPORTS ===== -->
+        <div class="section" id="section-reports">
+          <div class="section-title">신고 관리</div>
+          <div class="section-sub">사용자 신고 내역을 검토하고 처리합니다</div>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterBtn(this)">전체 (24)</button>
+            <button class="filter-btn" onclick="filterBtn(this)">처리 대기 (2)</button>
+            <button class="filter-btn" onclick="filterBtn(this)">처리 완료 (22)</button>
+          </div>
+          <div id="reports-list"></div>
+        </div>
+
+        <!-- ===== NOTICE ===== -->
+        <div class="section" id="section-notice">
+          <div class="section-title">공지사항 관리</div>
+          <div class="section-sub">사용자에게 공지사항을 작성하고 관리합니다</div>
+          <div class="chart-card" style="margin-bottom:20px;">
+            <div class="chart-card-title" style="margin-bottom:20px;">새 공지사항 작성</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <input type="text" class="dark-input" placeholder="제목" style="margin-bottom:0;">
+              <select class="dark-input" style="margin-bottom:0;">
+                <option>전체 공지</option><option>사용자 공지</option><option>전문가 공지</option>
+              </select>
+              <textarea class="dark-input" placeholder="내용을 입력하세요..." style="min-height:120px;resize:vertical;margin-bottom:0;"></textarea>
+              <div style="display:flex;gap:10px;">
+                <button class="action-btn action-btn-approve" style="padding:10px 20px;font-size:0.9rem;" onclick="showToast('공지사항이 등록되었습니다.','success')">게시하기</button>
+                <button class="action-btn action-btn-reject" style="padding:10px 20px;font-size:0.9rem;">임시저장</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">공지사항 목록</div></div>
+            <table>
+              <thead><tr><th>제목</th><th>대상</th><th>작성일</th><th>조회수</th><th>관리</th></tr></thead>
+              <tbody>
+                <tr><td>[공지] Y-Call 서비스 이용약관 개정 안내</td><td><span class="tbadge tbadge-blue">전체</span></td><td>2026-06-15</td><td>12,841</td><td><div class="action-btns"><button class="action-btn action-btn-view">수정</button><button class="action-btn action-btn-reject">삭제</button></div></td></tr>
+                <tr><td>[전문가] 수수료 정책 변경 안내</td><td><span class="tbadge tbadge-amber">전문가</span></td><td>2026-06-10</td><td>1,823</td><td><div class="action-btns"><button class="action-btn action-btn-view">수정</button><button class="action-btn action-btn-reject">삭제</button></div></td></tr>
+                <tr><td>[이벤트] 첫 상담 무료 프로모션</td><td><span class="tbadge tbadge-green">사용자</span></td><td>2026-06-01</td><td>8,420</td><td><div class="action-btns"><button class="action-btn action-btn-view">수정</button><button class="action-btn action-btn-reject">삭제</button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===== SETTINGS ===== -->
+        <div class="section" id="section-settings">
+          <div class="section-title">시스템 설정</div>
+          <div class="section-sub">플랫폼 전반의 설정을 관리합니다</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="chart-card">
+              <div class="chart-card-title" style="margin-bottom:20px;">💰 수수료 설정</div>
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div>
+                  <div style="font-size:0.8125rem;color:#64748B;margin-bottom:6px;">플랫폼 수수료 (%)</div>
+                  <input type="number" class="dark-input" value="20" style="margin-bottom:0;">
+                </div>
+                <div>
+                  <div style="font-size:0.8125rem;color:#64748B;margin-bottom:6px;">최소 분당 요금 (원)</div>
+                  <input type="number" class="dark-input" value="500" style="margin-bottom:0;">
+                </div>
+                <div>
+                  <div style="font-size:0.8125rem;color:#64748B;margin-bottom:6px;">무료 상담 시간 (분)</div>
+                  <input type="number" class="dark-input" value="10" style="margin-bottom:0;">
+                </div>
+                <button class="action-btn action-btn-approve" style="padding:10px 20px;font-size:0.9rem;" onclick="showToast('설정이 저장되었습니다.','success')">저장</button>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-title" style="margin-bottom:20px;">🔔 알림 설정</div>
+              <div style="display:flex;flex-direction:column;gap:16px;">
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:0.9375rem;color:#CBD5E1;">신규 가입 알림</span>
+                  <div class="toggle"><input type="checkbox" checked><span class="slider"></span></div>
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:0.9375rem;color:#CBD5E1;">전문가 승인 요청 알림</span>
+                  <div class="toggle"><input type="checkbox" checked><span class="slider"></span></div>
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:0.9375rem;color:#CBD5E1;">신고 접수 알림</span>
+                  <div class="toggle"><input type="checkbox" checked><span class="slider"></span></div>
+                </label>
+                <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                  <span style="font-size:0.9375rem;color:#CBD5E1;">정산 신청 알림</span>
+                  <div class="toggle"><input type="checkbox"><span class="slider"></span></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // ===== LOGIN =====
+    function adminLogin() {
+      const id = document.getElementById('admin-id').value;
+      const pw = document.getElementById('admin-pw').value;
+      if (id === 'admin' && pw === '1234') {
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'flex';
+        initAdmin();
+      } else {
+        showToast('아이디 또는 비밀번호가 틀렸습니다.', 'error');
+      }
+    }
+    function adminLogout() {
+      document.getElementById('admin-app').style.display = 'none';
+      document.getElementById('admin-login').style.display = 'flex';
+    }
+    document.getElementById('admin-pw').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+
+    // ===== SECTION SWITCH =====
+    function showSection(id, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-' + id).classList.add('active');
+      if (el) el.classList.add('active');
+      const titles = { overview:'대시보드', stats:'통계/매출', users:'회원 관리', experts:'전문가 관리', approve:'전문가 승인', calls:'상담 내역', settle:'정산 관리', reports:'신고 관리', notice:'공지사항', settings:'시스템 설정' };
+      document.getElementById('topbar-title').textContent = titles[id] || '';
+    }
+
+    function filterBtn(el) {
+      el.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+    function filterUsers(el, type) { filterBtn(el); }
+
+    // ===== CHART =====
+    let chartMode = 'revenue';
+    const monthLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+    const revenueData = [1580,1840,2100,1920,2380,2483,0,0,0,0,0,0];
+    const callsData  = [5200,6100,7200,6800,7900,8472,0,0,0,0,0,0];
+
+    function renderMainChart() {
+      const data = chartMode === 'revenue' ? revenueData : callsData;
+      const max = Math.max(...data.filter(v => v > 0));
+      const el = document.getElementById('main-chart');
+      el.innerHTML = data.map((v, i) => v === 0 ? '' : `
+        <div class="bar-wrap">
+          <div class="bar-val">${chartMode==='revenue' ? v+'만' : v.toLocaleString()}</div>
+          <div class="bar ${chartMode==='revenue' ? 'bar-revenue' : 'bar-calls'}" style="height:${(v/max)*130}px;" title="${v}"></div>
+          <div class="bar-label">${monthLabels[i]}</div>
+        </div>
+      `).join('');
+    }
+
+    function switchChart(el, mode) {
+      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      chartMode = mode;
+      renderMainChart();
+    }
+
+    function renderDailyChart() {
+      const data = Array.from({length: 30}, (_, i) => Math.floor(Math.random() * 150 + 50));
+      const max = Math.max(...data);
+      const el = document.getElementById('daily-chart');
+      el.innerHTML = data.map((v, i) => `
+        <div class="bar-wrap" style="flex:none;width:calc((100%-${29*4}px)/30);">
+          <div class="bar bar-revenue" style="height:${(v/max)*130}px;min-width:6px;" title="${v}만원"></div>
+        </div>
+      `).join('');
+    }
+
+    function renderHourlyChart() {
+      const hours = [0,0,0,0,0,2,8,15,22,28,24,18,20,22,19,17,21,25,28,30,26,18,10,4];
+      const max = Math.max(...hours);
+      const el = document.getElementById('hourly-chart');
+      el.innerHTML = hours.map((v, i) => `
+        <div class="bar-wrap">
+          <div class="bar bar-calls" style="height:${(v/max)*100}px;" title="${i}시: ${v}건"></div>
+          <div class="bar-label">${i%6===0 ? i+'시' : ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderCategoryStats() {
+      const data = [
+        { name: 'IT/개발', count: 2340, pct: 28 },
+        { name: '금융/세무', count: 1820, pct: 21 },
+        { name: '법률', count: 1540, pct: 18 },
+        { name: '의료/건강', count: 1120, pct: 13 },
+        { name: '심리상담', count: 890, pct: 10 },
+        { name: '기타', count: 762, pct: 9 },
+      ];
+      const el = document.getElementById('category-stats');
+      el.innerHTML = data.map(d => `
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:0.8125rem;color:#94A3B8;">${d.name}</span>
+            <span style="font-size:0.8125rem;color:#64748B;">${d.count.toLocaleString()}건 (${d.pct}%)</span>
+          </div>
+          <div style="height:6px;background:#334155;border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${d.pct}%;background:var(--primary);border-radius:99px;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== TABLES =====
+    function renderUsersTable() {
+      const names = ['김민수','이지은','박준영','최서연','정대호','한소희','강민준','윤지혜','오세훈','임수진'];
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = names.map((n, i) => `
+        <tr>
+          <td style="color:#475569;">#${(52841-i).toLocaleString()}</td>
+          <td style="font-weight:600;color:white;">${n}</td>
+          <td>${n[0].toLowerCase()}****@gmail.com</td>
+          <td>2026-06-${String(20-i).padStart(2,'0')}</td>
+          <td>${Math.floor(Math.random()*50+1)}건</td>
+          <td>${(Math.floor(Math.random()*500+50)*1000).toLocaleString()}원</td>
+          <td><span class="tbadge ${i===3?'tbadge-amber':i===7?'tbadge-red':'tbadge-green'}">${i===3?'인증 대기':i===7?'정지':'활성'}</span></td>
+          <td><div class="action-btns">
+            <button class="action-btn action-btn-view" onclick="showToast('상세 정보: ${n}','success')">상세</button>
+            <button class="action-btn action-btn-warn" onclick="showToast('${n}님에게 경고를 발송했습니다.','success')">경고</button>
+            <button class="action-btn action-btn-block" onclick="showToast('${n}님을 정지했습니다.','error')">정지</button>
+          </div></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderExpertsTable() {
+      const tbody = document.getElementById('experts-tbody');
+      tbody.innerHTML = EXPERTS.map(e => `
+        <tr>
+          <td style="font-weight:600;color:white;">${e.name}</td>
+          <td><span class="tbadge tbadge-blue">${e.categoryName}</span></td>
+          <td>${e.pricePerMin.toLocaleString()}원</td>
+          <td>${e.callCount.toLocaleString()}건</td>
+          <td style="color:#F59E0B;">★ ${e.rating.toFixed(1)}</td>
+          <td style="color:#10B981;">${(e.pricePerMin * e.callCount * 0.8 / 100).toFixed(0)}만원</td>
+          <td><span class="tbadge ${e.isCertified?'tbadge-green':'tbadge-amber'}">${e.isCertified?'인증 완료':'임시 등록'}</span></td>
+          <td><div class="action-btns">
+            <button class="action-btn action-btn-view" onclick="showToast('${e.name} 상세보기','success')">상세</button>
+            <button class="action-btn action-btn-block" onclick="showToast('${e.name}님을 정지했습니다.','error')">정지</button>
+          </div></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderCallsTable() {
+      const users = ['김○○','이○○','박○○','최○○','정○○','한○○'];
+      const tbody = document.getElementById('calls-tbody');
+      tbody.innerHTML = Array.from({length:10}, (_, i) => {
+        const expert = EXPERTS[i % EXPERTS.length];
+        const mins = [10,15,20,30][i%4];
+        const amt = expert.pricePerMin * mins;
+        const statuses = [['tbadge-green','완료'],['tbadge-blue','진행 중'],['tbadge-gray','취소']];
+        const [cls, label] = statuses[i % statuses.length === 1 && i>4 ? 0 : i % statuses.length];
+        return `<tr>
+          <td style="color:#475569;">#${8472-i}</td>
+          <td>${users[i%users.length]}</td>
+          <td style="color:white;font-weight:600;">${expert.name}</td>
+          <td><span class="tbadge tbadge-blue">${expert.categoryName}</span></td>
+          <td>${mins}분</td>
+          <td style="color:#10B981;font-weight:700;">${amt.toLocaleString()}원</td>
+          <td style="color:#64748B;">2026-06-${String(20-Math.floor(i/3)).padStart(2,'0')}</td>
+          <td><span class="tbadge ${cls}">${label}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderApproveList() {
+      const applicants = [
+        { name:'강민준', cat:'법률', title:'변호사 10년', date:'2026-06-19', doc:'신분증+자격증' },
+        { name:'윤지혜', cat:'금융/세무', title:'공인세무사', date:'2026-06-18', doc:'신분증+자격증' },
+        { name:'오세훈', cat:'IT/개발', title:'풀스택 개발자', date:'2026-06-17', doc:'신분증만' },
+      ];
+      const el = document.getElementById('approve-list');
+      el.innerHTML = applicants.map(a => `
+        <div class="table-card" style="margin-bottom:14px;">
+          <div style="padding:20px 24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:700;color:#A78BFA;">${a.name[0]}</div>
+                <div>
+                  <div style="font-size:1rem;font-weight:700;color:white;margin-bottom:3px;">${a.name} <span class="tbadge tbadge-amber" style="font-size:0.75rem;">대기 중</span></div>
+                  <div style="font-size:0.875rem;color:#64748B;">${a.title} · ${a.cat}</div>
+                  <div style="font-size:0.8125rem;color:#475569;margin-top:2px;">📎 제출 서류: ${a.doc} · 신청일: ${a.date}</div>
+                </div>
+              </div>
+              <div class="action-btns">
+                <button class="action-btn action-btn-view" onclick="showToast('서류 확인: ${a.name}','success')">서류 확인</button>
+                <button class="action-btn action-btn-approve" onclick="approveExpert(this,'${a.name}')">✅ 승인</button>
+                <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">❌ 거절</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSettleList() {
+      const el = document.getElementById('settle-list');
+      el.innerHTML = EXPERTS.map(e => {
+        const amt = Math.floor(e.pricePerMin * e.callCount * 0.8 / 100) * 10000;
+        return `
+          <div class="settle-item">
+            <div class="settle-avatar">${e.initials}</div>
+            <div class="settle-info">
+              <div class="settle-name">${e.name}</div>
+              <div class="settle-meta">${e.categoryName} · 상담 ${e.callCount.toLocaleString()}건 · 신청일: 2026-06-20</div>
+            </div>
+            <div class="settle-amount">${amt.toLocaleString()}원</div>
+            <div class="action-btns" style="margin-left:16px;">
+              <button class="action-btn action-btn-approve" onclick="this.parentElement.parentElement.style.opacity='0.5';showToast('${e.name}님 정산이 완료되었습니다.','success')">정산 승인</button>
+              <button class="action-btn action-btn-reject" onclick="this.parentElement.parentElement.remove()">보류</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderReports() {
+      const reports = [
+        { severity:'high', title:'부적절한 상담 내용 신고', desc:'전문 영역 이외의 개인 홍보 및 외부 연락처 유도 행위가 발생했습니다. 즉각적인 조치가 필요합니다.', reporter:'박○○', target:'전문가 A', date:'2026-06-20', status:'대기' },
+        { severity:'high', title:'사기성 결제 유도 신고', desc:'상담 중 외부 결제를 유도하는 발언이 있었습니다. 해당 전문가에 대한 즉각적인 계정 검토가 필요합니다.', reporter:'이○○', target:'전문가 B', date:'2026-06-19', status:'대기' },
+        { severity:'mid', title:'불친절 및 반말 사용', desc:'상담 중 지속적인 반말 사용과 불친절한 태도로 이용자가 불쾌함을 느꼈습니다.', reporter:'김○○', target:'전문가 C', date:'2026-06-18', status:'처리 완료' },
+        { severity:'low', title:'응답 지연 민원', desc:'예약 시간에 5분 이상 응답하지 않았습니다.', reporter:'최○○', target:'전문가 D', date:'2026-06-17', status:'처리 완료' },
+      ];
+      const el = document.getElementById('reports-list');
+      el.innerHTML = reports.map(r => `
+        <div class="report-item">
+          <div class="report-header">
+            <span class="report-severity sev-${r.severity}">${r.severity==='high'?'🔴 긴급':r.severity==='mid'?'🟡 중간':'🟢 낮음'}</span>
+            <span class="report-title">${r.title}</span>
+            <span class="tbadge ${r.status==='대기'?'tbadge-amber':'tbadge-gray'}" style="margin-left:auto;">${r.status}</span>
+          </div>
+          <p class="report-desc">${r.desc}</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div class="report-meta">신고자: ${r.reporter} · 대상: ${r.target} · ${r.date}</div>
+            ${r.status==='대기' ? `<div class="action-btns">
+              <button class="action-btn action-btn-view" onclick="showToast('상세 내역 확인','success')">상세</button>
+              <button class="action-btn action-btn-warn" onclick="showToast('경고를 발송했습니다.','success')">경고 발송</button>
+              <button class="action-btn action-btn-block" onclick="this.closest('.report-item').querySelector('.tbadge').className='tbadge tbadge-gray';this.closest('.action-btns').remove();showToast('계정이 정지되었습니다.','error')">계정 정지</button>
+            </div>` : '<span style="font-size:0.875rem;color:#475569;">처리 완료됨</span>'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== ACTIONS =====
+    function approveExpert(btn, name) {
+      btn.closest('tr, .table-card')?.style && (btn.closest('.table-card').style.opacity = '0.5');
+      btn.closest('tr') && btn.closest('tr').remove();
+      showToast(`${name}님이 승인되었습니다. ✅`, 'success');
+    }
+    function rejectExpert(btn) {
+      btn.closest('tr')?.remove();
+      btn.closest('.table-card')?.style && (btn.closest('.table-card').style.opacity = '0.4');
+      showToast('신청이 거절되었습니다.', 'error');
+    }
+    function bulkSettle() {
+      document.querySelectorAll('.settle-item').forEach(el => { el.style.opacity = '0.4'; });
+      showToast('전체 정산이 완료되었습니다. 💰', 'success');
+    }
+
+    // ===== INIT =====
+    function initAdmin() {
+      document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+      renderMainChart();
+      renderDailyChart();
+      renderHourlyChart();
+      renderCategoryStats();
+      renderUsersTable();
+      renderExpertsTable();
+      renderCallsTable();
+      renderApproveList();
+      renderSettleList();
+      renderReports();
+    }
+
+    // Auto-login check
+    if (sessionStorage.getItem('admin_logged')) {
+      document.getElementById('admin-login').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'flex';
+      initAdmin();
+    }
+  </script>
+</body>
+</html>
