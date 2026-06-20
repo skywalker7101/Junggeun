@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 / 회원가입 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); }
+    .auth-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 40px 16px;
+    }
+    .auth-container {
+      display: grid; grid-template-columns: 1fr 1fr; max-width: 960px; width: 100%;
+      background: white; border-radius: var(--radius-xl); overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+    .auth-left {
+      background: linear-gradient(135deg, #4C1D95, #7C3AED);
+      padding: 60px 40px; display: flex; flex-direction: column; justify-content: center;
+      color: white;
+    }
+    .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+    .auth-logo-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .auth-logo-text { font-size: 1.75rem; font-weight: 800; }
+    .auth-left h2 { font-size: 1.875rem; font-weight: 800; line-height: 1.3; margin-bottom: 16px; }
+    .auth-left p { font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 36px; }
+    .auth-features { display: flex; flex-direction: column; gap: 14px; }
+    .auth-feature { display: flex; align-items: center; gap: 12px; font-size: 0.9375rem; }
+    .auth-feature-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+
+    .auth-right { padding: 48px 40px; display: flex; flex-direction: column; }
+    .auth-tabs { display: flex; border-bottom: 2px solid var(--gray-200); margin-bottom: 32px; }
+    .auth-tab {
+      flex: 1; text-align: center; padding: 14px;
+      font-size: 1rem; font-weight: 600; color: var(--gray-400);
+      cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: var(--transition);
+    }
+    .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    .auth-form.hidden { display: none; }
+
+    .social-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm);
+      font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+      background: white; font-family: inherit;
+    }
+    .social-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+    .social-btn-icon { font-size: 1.25rem; }
+
+    .divider-text {
+      display: flex; align-items: center; gap: 12px; margin: 4px 0;
+      font-size: 0.875rem; color: var(--gray-400);
+    }
+    .divider-text::before, .divider-text::after {
+      content: ''; flex: 1; height: 1px; background: var(--gray-200);
+    }
+
+    .terms-text { font-size: 0.8125rem; color: var(--gray-400); text-align: center; line-height: 1.6; }
+    .terms-text a { color: var(--primary); text-decoration: underline; }
+
+    .input-eye {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: var(--gray-400); font-size: 1.1rem;
+    }
+
+    @media (max-width: 640px) {
+      .auth-container { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-container">
+      <!-- LEFT -->
+      <div class="auth-left">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">📞</div>
+          <span class="auth-logo-text">Y-Call</span>
+        </div>
+        <h2>전문가와 바로<br>연결되세요</h2>
+        <p>1,800명 이상의 검증된 전문가와<br>분당 단위로 간편하게 상담하세요</p>
+        <div class="auth-features">
+          <div class="auth-feature">
+            <div class="auth-feature-icon">⚡</div>
+            <span>평균 2분 이내 연결</span>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">✅</div>
+            <span>검증된 전문가 인증 시스템</span>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">🔒</div>
+            <span>안전한 결제 및 개인정보 보호</span>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">🎁</div>
+            <span>첫 가입 시 10분 무료 상담 제공</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="auth-right">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">로그인</div>
+          <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">회원가입</div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="form-login" class="auth-form">
+          <div class="social-btns">
+            <button class="social-btn" onclick="socialLogin('kakao')">
+              <span class="social-btn-icon">💛</span> 카카오로 로그인
+            </button>
+            <button class="social-btn" onclick="socialLogin('naver')">
+              <span class="social-btn-icon">🟩</span> 네이버로 로그인
+            </button>
+            <button class="social-btn" onclick="socialLogin('google')">
+              <span class="social-btn-icon">🔵</span> Google로 로그인
+            </button>
+          </div>
+          <div class="divider-text">또는 이메일로 로그인</div>
+
+          <div class="form-group">
+            <label class="form-label">이메일</label>
+            <div class="input-group">
+              <span class="input-group-icon">✉️</span>
+              <input type="email" class="form-input" id="login-email" placeholder="이메일 주소 입력">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <div class="input-group" style="position:relative;">
+              <span class="input-group-icon">🔒</span>
+              <input type="password" class="form-input" id="login-pw" placeholder="비밀번호 입력">
+              <span class="input-eye" onclick="togglePw('login-pw')">👁</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:0.9375rem;cursor:pointer;">
+              <input type="checkbox" style="accent-color:var(--primary);"> 로그인 상태 유지
+            </label>
+            <a href="#" style="font-size:0.9375rem;color:var(--primary);">비밀번호 찾기</a>
+          </div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">로그인</button>
+          <p style="text-align:center;font-size:0.9375rem;color:var(--gray-500);">
+            계정이 없으신가요? <a href="#" style="color:var(--primary);font-weight:600;" onclick="switchTab('signup');return false;">회원가입</a>
+          </p>
+        </div>
+
+        <!-- SIGNUP FORM -->
+        <div id="form-signup" class="auth-form hidden">
+          <div class="social-btns">
+            <button class="social-btn" onclick="socialLogin('kakao')">
+              <span class="social-btn-icon">💛</span> 카카오로 시작하기
+            </button>
+            <button class="social-btn" onclick="socialLogin('google')">
+              <span class="social-btn-icon">🔵</span> Google로 시작하기
+            </button>
+          </div>
+          <div class="divider-text">또는 이메일로 가입</div>
+
+          <div class="form-group">
+            <label class="form-label">이름</label>
+            <div class="input-group">
+              <span class="input-group-icon">👤</span>
+              <input type="text" class="form-input" id="signup-name" placeholder="실명 입력">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">이메일</label>
+            <div class="input-group">
+              <span class="input-group-icon">✉️</span>
+              <input type="email" class="form-input" id="signup-email" placeholder="이메일 주소 입력">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">전화번호</label>
+            <div class="input-group">
+              <span class="input-group-icon">📱</span>
+              <input type="tel" class="form-input" id="signup-phone" placeholder="010-0000-0000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <div class="input-group" style="position:relative;">
+              <span class="input-group-icon">🔒</span>
+              <input type="password" class="form-input" id="signup-pw" placeholder="8자 이상 입력">
+              <span class="input-eye" onclick="togglePw('signup-pw')">👁</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="doSignup()">무료로 회원가입</button>
+          <p class="terms-text">
+            회원가입 시 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에<br>동의하는 것으로 간주됩니다.
+          </p>
+          <p style="text-align:center;font-size:0.9375rem;color:var(--gray-500);">
+            이미 계정이 있으신가요? <a href="#" style="color:var(--primary);font-weight:600;" onclick="switchTab('login');return false;">로그인</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Read tab from URL
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('tab') === 'signup') switchTab('signup');
+
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('form-signup').classList.toggle('hidden', tab !== 'signup');
+    }
+
+    function togglePw(id) {
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    function socialLogin(provider) {
+      showToast(`${provider} 로그인은 Firebase 설정 후 이용 가능합니다.`, 'error');
+    }
+
+    function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pw = document.getElementById('login-pw').value;
+
+      if (!email || !pw) { showToast('이메일과 비밀번호를 입력해주세요.', 'error'); return; }
+
+      // Demo login
+      const demoUsers = JSON.parse(localStorage.getItem('ycall_users') || '[]');
+      const user = demoUsers.find(u => u.email === email && u.password === pw);
+      if (user || (email === 'demo@ycall.kr' && pw === '1234')) {
+        login({ name: user?.name || '데모 사용자', email, role: 'user' });
+        showToast('로그인 성공! 환영합니다 👋', 'success');
+        setTimeout(() => {
+          const redirect = sessionStorage.getItem('ycall_redirect');
+          sessionStorage.removeItem('ycall_redirect');
+          location.href = redirect || 'dashboard-user.html';
+        }, 1000);
+      } else {
+        showToast('이메일 또는 비밀번호가 틀렸습니다.', 'error');
+      }
+    }
+
+    function doSignup() {
+      const name  = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const phone = document.getElementById('signup-phone').value.trim();
+      const pw    = document.getElementById('signup-pw').value;
+
+      if (!name || !email || !phone || !pw) { showToast('모든 항목을 입력해주세요.', 'error'); return; }
+      if (pw.length < 8) { showToast('비밀번호는 8자 이상이어야 합니다.', 'error'); return; }
+      if (!/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(email)) { showToast('올바른 이메일 형식이 아닙니다.', 'error'); return; }
+
+      const users = JSON.parse(localStorage.getItem('ycall_users') || '[]');
+      if (users.find(u => u.email === email)) { showToast('이미 사용 중인 이메일입니다.', 'error'); return; }
+
+      const newUser = { name, email, phone, password: pw, role: 'user', createdAt: new Date().toISOString(), freeMinutes: 10 };
+      users.push(newUser);
+      localStorage.setItem('ycall_users', JSON.stringify(users));
+
+      login({ name, email, role: 'user', freeMinutes: 10 });
+      showToast('회원가입 성공! 10분 무료 쿠폰이 지급됐습니다 🎁', 'success');
+      setTimeout(() => {
+        const redirect = sessionStorage.getItem('ycall_redirect');
+        sessionStorage.removeItem('ycall_redirect');
+        location.href = redirect || 'dashboard-user.html';
+      }, 1500);
+    }
+
+    // Enter key
+    ['login-email','login-pw'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    });
+    ['signup-name','signup-email','signup-phone','signup-pw'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+    });
+  </script>
+</body>
+</html>

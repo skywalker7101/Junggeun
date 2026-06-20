@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); }
+    .dashboard-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; padding: 90px 0 60px; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .dash-sidebar { position: sticky; top: 80px; height: fit-content; }
+    .dash-profile-card {
+      background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);
+      padding: 24px; text-align: center; margin-bottom: 16px;
+    }
+    .dash-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0 auto 14px; }
+    .dash-user-name { font-size: 1.125rem; font-weight: 700; color: var(--gray-900); }
+    .dash-user-email { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 12px; }
+    .free-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--amber-100); color: #B45309; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.875rem; font-weight: 600; }
+
+    .dash-nav { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow: hidden; }
+    .dash-nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      font-size: 0.9375rem; font-weight: 500; color: var(--gray-600);
+      cursor: pointer; transition: var(--transition); border-left: 3px solid transparent;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .dash-nav-item:last-child { border-bottom: none; }
+    .dash-nav-item:hover { background: var(--gray-50); color: var(--gray-900); }
+    .dash-nav-item.active { background: var(--primary-50); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+    .dash-nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+    /* MAIN */
+    .dash-main {}
+    .dash-section { display: none; }
+    .dash-section.active { display: block; }
+    .dash-section-title { font-size: 1.375rem; font-weight: 800; color: var(--gray-900); margin-bottom: 24px; }
+
+    /* STATS */
+    .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 20px 24px; }
+    .stat-card-label { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 8px; }
+    .stat-card-val { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); }
+    .stat-card-sub { font-size: 0.8125rem; color: var(--gray-400); margin-top: 4px; }
+
+    /* BOOKING LIST */
+    .booking-list { display: flex; flex-direction: column; gap: 14px; }
+    .booking-item {
+      background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);
+      padding: 20px 24px; display: flex; align-items: center; gap: 16px;
+    }
+    .booking-avatar { width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .booking-info { flex: 1; }
+    .booking-name { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+    .booking-subtitle { font-size: 0.875rem; color: var(--gray-500); }
+    .booking-meta { font-size: 0.8125rem; color: var(--gray-400); margin-top: 4px; }
+    .booking-right { text-align: right; }
+    .booking-price { font-size: 1.0625rem; font-weight: 700; color: var(--primary); }
+    .booking-status-badge { font-size: 0.8125rem; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full); margin-top: 4px; display: inline-block; }
+    .status-upcoming { background: var(--amber-100); color: #B45309; }
+    .status-done { background: var(--green-100); color: var(--green); }
+    .status-ongoing { background: var(--primary-100); color: var(--primary); }
+    .status-cancelled { background: var(--gray-100); color: var(--gray-500); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-emoji { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-title { font-size: 1.125rem; font-weight: 700; color: var(--gray-700); margin-bottom: 8px; }
+    .empty-desc { font-size: 0.9375rem; color: var(--gray-500); margin-bottom: 24px; }
+
+    /* PROFILE EDIT */
+    .profile-edit-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 28px; }
+    .profile-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    @media (max-width: 768px) {
+      .dashboard-layout { grid-template-columns: 1fr; }
+      .dash-sidebar { position: static; }
+      .stats-cards { grid-template-columns: 1fr 1fr; }
+      .profile-edit-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="">
+
+  <header class="navbar" id="main-navbar"></header>
+
+  <div class="container">
+    <div class="dashboard-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="dash-sidebar">
+        <div class="dash-profile-card">
+          <div class="dash-avatar" id="dash-avatar">U</div>
+          <div class="dash-user-name" id="dash-name">사용자</div>
+          <div class="dash-user-email" id="dash-email"></div>
+          <div class="free-badge">🎁 무료 10분 보유</div>
+        </div>
+        <div class="dash-nav">
+          <div class="dash-nav-item active" onclick="showSection('overview')"><span class="dash-nav-icon">🏠</span> 홈</div>
+          <div class="dash-nav-item" onclick="showSection('bookings')"><span class="dash-nav-icon">📞</span> 상담 내역</div>
+          <div class="dash-nav-item" onclick="showSection('upcoming')"><span class="dash-nav-icon">📅</span> 예정된 상담</div>
+          <div class="dash-nav-item" onclick="showSection('favorites')"><span class="dash-nav-icon">❤️</span> 즐겨찾기</div>
+          <div class="dash-nav-item" onclick="showSection('profile')"><span class="dash-nav-icon">⚙️</span> 프로필 수정</div>
+          <div class="dash-nav-item" onclick="logout();location.href='index.html'"><span class="dash-nav-icon">🚪</span> 로그아웃</div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="dash-main">
+
+        <!-- OVERVIEW -->
+        <div class="dash-section active" id="section-overview">
+          <div class="dash-section-title">안녕하세요, <span id="greet-name">님</span> 👋</div>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-card-label">총 상담 횟수</div>
+              <div class="stat-card-val" id="stat-total-calls">0</div>
+              <div class="stat-card-sub">건</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">총 상담 시간</div>
+              <div class="stat-card-val" id="stat-total-mins">0</div>
+              <div class="stat-card-sub">분</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">총 결제 금액</div>
+              <div class="stat-card-val" id="stat-total-paid">0</div>
+              <div class="stat-card-sub">원</div>
+            </div>
+          </div>
+
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:24px;margin-bottom:24px;">
+            <div style="font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:16px;">최근 상담</div>
+            <div id="recent-bookings"></div>
+          </div>
+
+          <div style="background:linear-gradient(135deg,#4C1D95,#7C3AED);border-radius:var(--radius-lg);padding:28px;color:white;">
+            <div style="font-size:1.125rem;font-weight:700;margin-bottom:8px;">🎁 무료 상담 쿠폰이 있어요!</div>
+            <p style="font-size:0.9375rem;color:rgba(255,255,255,0.8);margin-bottom:20px;">첫 가입 혜택으로 10분 무료 상담을 이용하실 수 있습니다.</p>
+            <a href="experts.html" class="btn" style="background:white;color:var(--primary);font-weight:700;">전문가 찾아보기 →</a>
+          </div>
+        </div>
+
+        <!-- BOOKINGS -->
+        <div class="dash-section" id="section-bookings">
+          <div class="dash-section-title">상담 내역</div>
+          <div id="booking-list-all"></div>
+        </div>
+
+        <!-- UPCOMING -->
+        <div class="dash-section" id="section-upcoming">
+          <div class="dash-section-title">예정된 상담</div>
+          <div id="booking-list-upcoming"></div>
+        </div>
+
+        <!-- FAVORITES -->
+        <div class="dash-section" id="section-favorites">
+          <div class="dash-section-title">즐겨찾기 전문가</div>
+          <div class="empty-state">
+            <div class="empty-emoji">❤️</div>
+            <div class="empty-title">즐겨찾기한 전문가가 없어요</div>
+            <div class="empty-desc">마음에 드는 전문가를 즐겨찾기에 추가해보세요</div>
+            <a href="experts.html" class="btn btn-primary">전문가 찾기</a>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="dash-section" id="section-profile">
+          <div class="dash-section-title">프로필 수정</div>
+          <div class="profile-edit-card">
+            <div class="profile-edit-grid">
+              <div class="form-group">
+                <label class="form-label">이름</label>
+                <input type="text" class="form-input" id="edit-name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">이메일</label>
+                <input type="email" class="form-input" id="edit-email" disabled style="background:var(--gray-100);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">전화번호</label>
+                <input type="tel" class="form-input" id="edit-phone" placeholder="010-0000-0000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">닉네임</label>
+                <input type="text" class="form-input" id="edit-nickname" placeholder="커뮤니티 닉네임">
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="form-group">
+              <label class="form-label">새 비밀번호</label>
+              <input type="password" class="form-input" placeholder="변경할 경우에만 입력">
+            </div>
+            <div style="margin-top:20px;">
+              <button class="btn btn-primary" onclick="saveProfile()">저장하기</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer" id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!isLoggedIn()) { location.href = 'auth.html'; return; }
+
+      const user = currentUser;
+      document.getElementById('dash-avatar').textContent = user.name?.[0] || 'U';
+      document.getElementById('dash-name').textContent = user.name;
+      document.getElementById('dash-email').textContent = user.email || '';
+      document.getElementById('greet-name').textContent = user.name + '님';
+      document.getElementById('edit-name').value = user.name || '';
+      document.getElementById('edit-email').value = user.email || '';
+
+      loadBookings();
+    });
+
+    function loadBookings() {
+      const bookings = JSON.parse(localStorage.getItem('ycall_bookings') || '[]');
+
+      // Stats
+      document.getElementById('stat-total-calls').textContent = bookings.length;
+      const totalMins = bookings.reduce((a, b) => a + (b.duration || 0), 0);
+      document.getElementById('stat-total-mins').textContent = totalMins;
+      const totalPaid = bookings.reduce((a, b) => a + (b.total || 0), 0);
+      document.getElementById('stat-total-paid').textContent = totalPaid.toLocaleString('ko-KR');
+
+      // Recent (last 3)
+      const recent = [...bookings].reverse().slice(0, 3);
+      const recentEl = document.getElementById('recent-bookings');
+      recentEl.innerHTML = recent.length > 0 ? renderBookingItems(recent) :
+        `<div style="text-align:center;padding:30px;color:var(--gray-400);">상담 내역이 없습니다.<br><a href="experts.html" class="btn btn-outline btn-sm" style="margin-top:12px;">첫 상담 예약하기</a></div>`;
+
+      // All bookings
+      document.getElementById('booking-list-all').innerHTML = bookings.length > 0 ? renderBookingItems([...bookings].reverse()) :
+        `<div class="empty-state"><div class="empty-emoji">📞</div><div class="empty-title">상담 내역이 없어요</div><div class="empty-desc">전문가와의 첫 상담을 예약해보세요</div><a href="experts.html" class="btn btn-primary">전문가 찾기</a></div>`;
+
+      // Upcoming
+      const upcoming = bookings.filter(b => b.status === 'upcoming');
+      document.getElementById('booking-list-upcoming').innerHTML = upcoming.length > 0 ? renderBookingItems(upcoming) :
+        `<div class="empty-state"><div class="empty-emoji">📅</div><div class="empty-title">예정된 상담이 없어요</div><div class="empty-desc">지금 바로 전문가와 상담을 예약해보세요</div><a href="experts.html" class="btn btn-primary">예약하기</a></div>`;
+    }
+
+    function renderBookingItems(bookings) {
+      return `<div class="booking-list">${bookings.map(b => {
+        const expert = getExpertById(b.expertId) || {};
+        const statusMap = { upcoming: ['status-upcoming','예약 완료'], done: ['status-done','상담 완료'], ongoing: ['status-ongoing','진행 중'], cancelled: ['status-cancelled','취소'] };
+        const [cls, label] = statusMap[b.status] || ['status-done','완료'];
+        return `
+          <div class="booking-item">
+            <div class="booking-avatar">${(expert.initials || b.expertName?.[0] || '?')}</div>
+            <div class="booking-info">
+              <div class="booking-name">${b.expertName || '전문가'}</div>
+              <div class="booking-subtitle">${expert.title || ''}</div>
+              <div class="booking-meta">📅 ${b.date} · ⏱ ${b.duration}분 · 🕐 ${b.time}</div>
+            </div>
+            <div class="booking-right">
+              <div class="booking-price">${(b.total || 0).toLocaleString('ko-KR')}원</div>
+              <div class="booking-status-badge ${cls}">${label}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}</div>`;
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.dash-nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('section-' + id)?.classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('edit-name').value.trim();
+      if (!name) { showToast('이름을 입력해주세요.', 'error'); return; }
+      const updated = { ...currentUser, name };
+      login(updated);
+      document.getElementById('dash-name').textContent = name;
+      document.getElementById('greet-name').textContent = name + '님';
+      showToast('프로필이 저장되었습니다.', 'success');
+    }
+  </script>
+</body>
+</html>

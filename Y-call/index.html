@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Y-Call - 전문가와 바로 통화하세요</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #6D28D9 100%);
+      padding: 120px 0 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-content { position: relative; text-align: center; color: white; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px); border-radius: 99px;
+      padding: 8px 18px; font-size: 0.875rem; font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 3.25rem; font-weight: 800; line-height: 1.15;
+      margin-bottom: 20px; letter-spacing: -0.02em;
+    }
+    .hero h1 span { color: #FDE68A; }
+    .hero p {
+      font-size: 1.1875rem; color: rgba(255,255,255,0.85);
+      margin-bottom: 40px; line-height: 1.7;
+    }
+    .hero-search { max-width: 680px; margin: 0 auto 40px; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .hero-tag {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      color: white; padding: 8px 18px; border-radius: 99px;
+      font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: var(--transition);
+      text-decoration: none;
+    }
+    .hero-tag:hover { background: rgba(255,255,255,0.25); }
+
+    /* ===== STATS STRIP ===== */
+    .stats-strip {
+      background: var(--white); border-bottom: 1px solid var(--gray-200);
+      padding: 28px 0;
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+    .stat-item {
+      text-align: center; padding: 0 24px;
+      border-right: 1px solid var(--gray-200);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
+    .stat-label { font-size: 0.9375rem; color: var(--gray-500); margin-top: 4px; }
+
+    /* ===== CATEGORIES ===== */
+    .categories-section { background: var(--gray-50); }
+    .categories-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .category-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200); padding: 28px 20px;
+      text-align: center; cursor: pointer; transition: var(--transition);
+      text-decoration: none; color: inherit; display: block;
+    }
+    .category-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .category-emoji { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .category-name { font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+    .category-count { font-size: 0.875rem; color: var(--gray-500); }
+
+    /* ===== FEATURED EXPERTS ===== */
+    .experts-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-it-works { background: var(--gray-50); }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute; top: 40px; left: calc(16.67% + 20px); right: calc(16.67% + 20px);
+      height: 2px; background: linear-gradient(90deg, var(--primary-100), var(--primary), var(--primary-100));
+    }
+    .how-step { text-align: center; position: relative; }
+    .how-step-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--white); border: 2px solid var(--primary-100);
+      box-shadow: var(--shadow-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 20px; position: relative; z-index: 1;
+    }
+    .how-step-num {
+      position: absolute; top: -6px; right: -6px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--primary); color: white;
+      font-size: 0.8125rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .how-step h4 { font-size: 1.125rem; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; }
+    .how-step p { font-size: 0.9375rem; color: var(--gray-500); line-height: 1.7; }
+
+    /* ===== TESTIMONIALS ===== */
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200); padding: 28px;
+    }
+    .testimonial-stars { color: var(--amber); font-size: 1.1rem; margin-bottom: 14px; }
+    .testimonial-text { font-size: 0.9375rem; color: var(--gray-700); line-height: 1.8; margin-bottom: 20px; }
+    .testimonial-user { display: flex; align-items: center; gap: 12px; }
+    .testimonial-info strong { font-size: 0.9375rem; color: var(--gray-800); display: block; }
+    .testimonial-info span { font-size: 0.8125rem; color: var(--gray-500); }
+
+    /* ===== CTA SECTION ===== */
+    .cta-section {
+      background: linear-gradient(135deg, #4C1D95, #7C3AED);
+      padding: 100px 0; text-align: center; color: white;
+    }
+    .cta-section h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; }
+    .cta-section p { font-size: 1.125rem; color: rgba(255,255,255,0.85); margin-bottom: 36px; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; }
+    .btn-white { background: white; color: var(--primary); font-weight: 700; }
+    .btn-white:hover { background: var(--gray-100); }
+    .btn-outline-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; }
+    .btn-outline-white:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--gray-200); padding: 16px; }
+      .categories-grid { grid-template-columns: repeat(2, 1fr); }
+      .experts-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; gap: 24px; }
+      .steps-grid::before { display: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body data-page="home">
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="main-navbar"></header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          ✨ 국내 1위 전문가 통화 상담 플랫폼
+        </div>
+        <h1>전문가와 <span>바로 통화</span>하세요<br>언제 어디서든</h1>
+        <p>법률, 세무, 의료, IT 등 검증된 전문가와 1분 이내 연결<br>복잡한 문제를 간단하게 해결하세요</p>
+
+        <div class="hero-search">
+          <div class="search-bar">
+            <div class="search-field">
+              <span class="search-field-icon">🔍</span>
+              <input type="text" class="search-input" placeholder="어떤 전문가가 필요하신가요? (예: 계약서 검토, 세금 신고)" id="hero-search">
+            </div>
+            <div class="search-divider"></div>
+            <button class="search-category-btn" id="category-select-btn">
+              전체 분야 ▼
+            </button>
+            <button class="search-submit" onclick="doSearch()">검색하기</button>
+          </div>
+        </div>
+
+        <div class="hero-tags">
+          <a href="experts.html?cat=legal" class="hero-tag">⚖️ 법률 상담</a>
+          <a href="experts.html?cat=finance" class="hero-tag">💰 세무/절세</a>
+          <a href="experts.html?cat=it" class="hero-tag">💻 IT 개발</a>
+          <a href="experts.html?cat=realty" class="hero-tag">🏢 부동산</a>
+          <a href="experts.html?cat=psych" class="hero-tag">🧠 심리상담</a>
+          <a href="experts.html?cat=medical" class="hero-tag">🏥 의료</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">1,800+</div>
+          <div class="stat-label">등록 전문가</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">52만+</div>
+          <div class="stat-label">누적 상담 건수</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">4.8 ★</div>
+          <div class="stat-label">평균 만족도</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">98%</div>
+          <div class="stat-label">재이용 의향</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">CATEGORIES</div>
+        <h2>어떤 전문가가 필요하세요?</h2>
+        <p>8개 전문 분야, 1,800명 이상의 검증된 전문가가 대기 중입니다</p>
+      </div>
+      <div class="categories-grid" id="categories-grid"></div>
+    </div>
+  </section>
+
+  <!-- FEATURED EXPERTS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">TOP EXPERTS</div>
+        <h2>지금 바로 통화할 수 있어요</h2>
+        <p>실시간 접속 중인 인기 전문가를 만나보세요</p>
+      </div>
+      <div class="experts-grid" id="featured-experts"></div>
+      <div class="text-center mt-32">
+        <a href="experts.html" class="btn btn-outline btn-lg">전체 전문가 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">HOW IT WORKS</div>
+        <h2>이렇게 간단합니다</h2>
+        <p>3단계로 전문가와 연결되세요</p>
+      </div>
+      <div class="steps-grid">
+        <div class="how-step">
+          <div class="how-step-icon">
+            🔍
+            <div class="how-step-num">1</div>
+          </div>
+          <h4>전문가 찾기</h4>
+          <p>분야, 가격, 평점으로 나에게 맞는 전문가를 검색하세요</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-icon">
+            💳
+            <div class="how-step-num">2</div>
+          </div>
+          <h4>예약 & 결제</h4>
+          <p>원하는 시간대를 선택하고 안전하게 결제하세요. 분당 과금으로 딱 쓴 만큼만!</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-icon">
+            📞
+            <div class="how-step-num">3</div>
+          </div>
+          <h4>바로 통화</h4>
+          <p>예약 시간에 전화번호로 연결됩니다. 문제를 해결하고 만족도를 남기세요</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">REVIEWS</div>
+        <h2>이용 후기</h2>
+        <p>실제 이용자들의 생생한 후기를 확인하세요</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"부동산 계약 전 법률 상담을 받았는데 덕분에 문제가 될 뻔한 조항을 미리 발견했습니다. 15분 만에 이렇게 명확하게 설명해주실 줄 몰랐어요."</p>
+          <div class="testimonial-user">
+            <div class="avatar avatar-md">박</div>
+            <div class="testimonial-info">
+              <strong>박○○ 님</strong>
+              <span>법률 상담 이용</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"종합소득세 신고를 앞두고 혼자 고민하다가 이용했어요. 30분 상담에 100만원 이상 절세 방법을 알게 됐습니다. 완전 이득이에요!"</p>
+          <div class="testimonial-user">
+            <div class="avatar avatar-md">이</div>
+            <div class="testimonial-info">
+              <strong>이○○ 님</strong>
+              <span>세무 상담 이용</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"스타트업 기술 스택 선택 때문에 고민이 많았는데 CTO 출신 전문가와 통화 후 방향이 명확해졌습니다. 강력 추천합니다!"</p>
+          <div class="testimonial-user">
+            <div class="avatar avatar-md">정</div>
+            <div class="testimonial-info">
+              <strong>정○○ 님</strong>
+              <span>IT 개발 상담 이용</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>지금 바로 시작하세요</h2>
+      <p>첫 상담 10분 무료 — 회원가입 후 즉시 사용 가능</p>
+      <div class="cta-buttons">
+        <a href="auth.html?tab=signup" class="btn btn-white btn-lg">무료로 시작하기</a>
+        <a href="experts.html" class="btn btn-outline-white btn-lg">전문가 둘러보기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="main-footer"></footer>
+
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Render categories
+    const catGrid = document.getElementById('categories-grid');
+    catGrid.innerHTML = CATEGORIES.map(c => `
+      <a href="experts.html?cat=${c.id}" class="category-card">
+        <span class="category-emoji">${c.emoji}</span>
+        <div class="category-name">${c.name}</div>
+        <div class="category-count">전문가 ${c.count}명+</div>
+      </a>
+    `).join('');
+
+    // Render featured experts (online first, max 6)
+    const featured = [...EXPERTS].sort((a, b) => b.isOnline - a.isOnline).slice(0, 6);
+    const expGrid = document.getElementById('featured-experts');
+    expGrid.innerHTML = featured.map(e => `
+      <div class="expert-card" onclick="location.href='expert-detail.html?id=${e.id}'">
+        <div class="expert-card-img">
+          <div class="expert-avatar-init">${e.initials}</div>
+          ${e.isOnline ? '<div class="online-dot">지금 통화 가능</div>' : ''}
+        </div>
+        <div class="expert-card-body">
+          <div class="flex items-center gap-8">
+            <div class="expert-name">${e.name}</div>
+            ${e.isCertified ? '<span class="badge badge-purple" style="font-size:0.75rem;padding:2px 8px;">인증</span>' : ''}
+          </div>
+          <div class="expert-title">${e.title}</div>
+          <div class="expert-tags">${e.tags.map(t => `<span class="expert-tag">${t}</span>`).join('')}</div>
+          <div class="expert-rating">
+            <span class="stars">${renderStars(e.rating)}</span>
+            <span style="font-weight:700;">${e.rating.toFixed(1)}</span>
+            <span class="rating-count">(${e.reviewCount.toLocaleString()})</span>
+          </div>
+        </div>
+        <div class="expert-card-footer">
+          <span class="price-label">분당</span>
+          <span class="price-value">${formatPrice(e.pricePerMin)}원</span>
+        </div>
+      </div>
+    `).join('');
+
+    function doSearch() {
+      const q = document.getElementById('hero-search').value;
+      location.href = `experts.html?q=${encodeURIComponent(q)}`;
+    }
+
+    document.getElementById('hero-search').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
+  </script>
+</body>
+</html>

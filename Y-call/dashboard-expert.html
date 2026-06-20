@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전문가 대시보드 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); }
+    .dashboard-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; padding: 90px 0 60px; min-height: 100vh; }
+
+    .dash-sidebar { position: sticky; top: 80px; height: fit-content; }
+    .dash-profile-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 24px; text-align: center; margin-bottom: 16px; }
+    .dash-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0 auto 14px; }
+    .dash-user-name { font-size: 1.125rem; font-weight: 700; }
+    .dash-user-title { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 10px; }
+    .status-toggle { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .toggle { position: relative; width: 48px; height: 26px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: var(--gray-300); border-radius: 99px; cursor: pointer; transition: var(--transition); }
+    .slider::before { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; left: 3px; top: 3px; transition: var(--transition); }
+    input:checked + .slider { background: var(--green); }
+    input:checked + .slider::before { transform: translateX(22px); }
+    .status-text { font-size: 0.875rem; font-weight: 600; }
+    .status-on { color: var(--green); }
+    .status-off { color: var(--gray-400); }
+
+    .dash-nav { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow: hidden; }
+    .dash-nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; font-size: 0.9375rem; font-weight: 500; color: var(--gray-600); cursor: pointer; transition: var(--transition); border-left: 3px solid transparent; border-bottom: 1px solid var(--gray-100); }
+    .dash-nav-item:last-child { border-bottom: none; }
+    .dash-nav-item:hover { background: var(--gray-50); color: var(--gray-900); }
+    .dash-nav-item.active { background: var(--primary-50); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+    .dash-nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+    .dash-section { display: none; }
+    .dash-section.active { display: block; }
+    .dash-section-title { font-size: 1.375rem; font-weight: 800; color: var(--gray-900); margin-bottom: 24px; }
+
+    .stats-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 20px; }
+    .stat-card-label { font-size: 0.8125rem; color: var(--gray-500); margin-bottom: 6px; }
+    .stat-card-val { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); }
+    .stat-card-sub { font-size: 0.8125rem; color: var(--gray-400); margin-top: 2px; }
+    .stat-card-change { font-size: 0.8125rem; font-weight: 600; margin-top: 4px; }
+    .change-up { color: var(--green); }
+    .change-down { color: var(--red); }
+
+    .earnings-chart { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 24px; margin-bottom: 24px; }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .chart-title { font-size: 1rem; font-weight: 700; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 140px; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .chart-bar { width: 100%; background: var(--primary-100); border-radius: 6px 6px 0 0; transition: var(--transition); min-height: 4px; }
+    .chart-bar:hover { background: var(--primary); }
+    .chart-label { font-size: 0.75rem; color: var(--gray-400); }
+    .chart-val { font-size: 0.75rem; color: var(--gray-600); font-weight: 600; }
+
+    .calls-list { display: flex; flex-direction: column; gap: 12px; }
+    .call-item { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+    .call-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .call-info { flex: 1; }
+    .call-name { font-size: 0.9375rem; font-weight: 700; color: var(--gray-900); }
+    .call-meta { font-size: 0.8125rem; color: var(--gray-500); margin-top: 2px; }
+    .call-right { text-align: right; }
+    .call-amount { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+    .call-date { font-size: 0.8125rem; color: var(--gray-400); }
+
+    .profile-edit-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 28px; }
+    .profile-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); min-height: 48px; cursor: text; }
+    .tag-chip { background: var(--primary-100); color: var(--primary); padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .tag-chip-del { cursor: pointer; opacity: 0.6; }
+    .tag-chip-del:hover { opacity: 1; }
+
+    .withdraw-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 28px; }
+    .balance-big { font-size: 2.5rem; font-weight: 800; color: var(--gray-900); margin: 8px 0; }
+    .balance-label { font-size: 0.9375rem; color: var(--gray-500); }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-emoji { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-title { font-size: 1.125rem; font-weight: 700; color: var(--gray-700); margin-bottom: 8px; }
+    .empty-desc { font-size: 0.9375rem; color: var(--gray-500); }
+
+    @media (max-width: 768px) {
+      .dashboard-layout { grid-template-columns: 1fr; }
+      .dash-sidebar { position: static; }
+      .stats-cards { grid-template-columns: repeat(2, 1fr); }
+      .profile-edit-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="">
+
+  <header class="navbar" id="main-navbar"></header>
+
+  <div class="container">
+    <div class="dashboard-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="dash-sidebar">
+        <div class="dash-profile-card">
+          <div class="dash-avatar" id="dash-avatar">E</div>
+          <div class="dash-user-name" id="dash-name">전문가</div>
+          <div class="dash-user-title" id="dash-title">전문가</div>
+          <div class="status-toggle">
+            <label class="toggle">
+              <input type="checkbox" id="online-toggle" checked onchange="toggleOnline(this)">
+              <span class="slider"></span>
+            </label>
+            <span class="status-text status-on" id="status-label">🟢 통화 가능</span>
+          </div>
+        </div>
+        <div class="dash-nav">
+          <div class="dash-nav-item active" onclick="showSection('overview')"><span class="dash-nav-icon">📊</span> 대시보드</div>
+          <div class="dash-nav-item" onclick="showSection('calls')"><span class="dash-nav-icon">📞</span> 상담 내역</div>
+          <div class="dash-nav-item" onclick="showSection('schedule')"><span class="dash-nav-icon">📅</span> 일정 관리</div>
+          <div class="dash-nav-item" onclick="showSection('earnings')"><span class="dash-nav-icon">💰</span> 수익 / 정산</div>
+          <div class="dash-nav-item" onclick="showSection('reviews')"><span class="dash-nav-icon">⭐</span> 리뷰 관리</div>
+          <div class="dash-nav-item" onclick="showSection('profile-edit')"><span class="dash-nav-icon">⚙️</span> 프로필 수정</div>
+          <div class="dash-nav-item" onclick="logout();location.href='index.html'"><span class="dash-nav-icon">🚪</span> 로그아웃</div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+
+        <!-- OVERVIEW -->
+        <div class="dash-section active" id="section-overview">
+          <div class="dash-section-title">대시보드</div>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-card-label">이번 달 수익</div>
+              <div class="stat-card-val">892,000</div>
+              <div class="stat-card-sub">원</div>
+              <div class="stat-card-change change-up">▲ 23% 지난달 대비</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">이번 달 상담</div>
+              <div class="stat-card-val">47</div>
+              <div class="stat-card-sub">건</div>
+              <div class="stat-card-change change-up">▲ 12건 증가</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">평균 평점</div>
+              <div class="stat-card-val" style="color:var(--amber);">4.9</div>
+              <div class="stat-card-sub">/ 5.0</div>
+              <div class="stat-card-change change-up">★ 우수 전문가</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">응답 시간</div>
+              <div class="stat-card-val">1.8</div>
+              <div class="stat-card-sub">분 평균</div>
+              <div class="stat-card-change change-up">▲ 빠른 응답</div>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="earnings-chart">
+            <div class="chart-header">
+              <div class="chart-title">📈 최근 7일 수익</div>
+              <select class="form-select" style="width:auto;padding:6px 32px 6px 10px;font-size:0.875rem;">
+                <option>최근 7일</option>
+                <option>최근 30일</option>
+              </select>
+            </div>
+            <div class="chart-bars" id="earnings-chart"></div>
+          </div>
+
+          <!-- Recent calls -->
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:24px;">
+            <div style="font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:16px;">최근 상담</div>
+            <div class="calls-list">
+              <div class="call-item">
+                <div class="call-avatar">박</div>
+                <div class="call-info">
+                  <div class="call-name">박○○ 님</div>
+                  <div class="call-meta">⏱ 20분 · 계약서 검토 상담</div>
+                </div>
+                <div class="call-right">
+                  <div class="call-amount">40,000원</div>
+                  <div class="call-date">오늘 14:30</div>
+                </div>
+              </div>
+              <div class="call-item">
+                <div class="call-avatar">이</div>
+                <div class="call-info">
+                  <div class="call-name">이○○ 님</div>
+                  <div class="call-meta">⏱ 15분 · 임대차 분쟁 상담</div>
+                </div>
+                <div class="call-right">
+                  <div class="call-amount">30,000원</div>
+                  <div class="call-date">오늘 11:00</div>
+                </div>
+              </div>
+              <div class="call-item">
+                <div class="call-avatar">최</div>
+                <div class="call-info">
+                  <div class="call-name">최○○ 님</div>
+                  <div class="call-meta">⏱ 30분 · 기업법무 상담</div>
+                </div>
+                <div class="call-right">
+                  <div class="call-amount">60,000원</div>
+                  <div class="call-date">어제 16:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CALLS -->
+        <div class="dash-section" id="section-calls">
+          <div class="dash-section-title">상담 내역</div>
+          <div class="calls-list">
+            <div class="call-item"><div class="call-avatar">박</div><div class="call-info"><div class="call-name">박○○ 님</div><div class="call-meta">⏱ 20분 · 오늘 14:30 · ★★★★★</div></div><div class="call-right"><div class="call-amount">40,000원</div><div><span class="badge badge-green">완료</span></div></div></div>
+            <div class="call-item"><div class="call-avatar">이</div><div class="call-info"><div class="call-name">이○○ 님</div><div class="call-meta">⏱ 15분 · 오늘 11:00 · ★★★★★</div></div><div class="call-right"><div class="call-amount">30,000원</div><div><span class="badge badge-green">완료</span></div></div></div>
+            <div class="call-item"><div class="call-avatar">정</div><div class="call-info"><div class="call-name">정○○ 님</div><div class="call-meta">⏱ 45분 · 어제 09:00 · ★★★★☆</div></div><div class="call-right"><div class="call-amount">90,000원</div><div><span class="badge badge-green">완료</span></div></div></div>
+            <div class="call-item"><div class="call-avatar">김</div><div class="call-info"><div class="call-name">김○○ 님</div><div class="call-meta">⏱ 10분 · 2026-06-18 · ★★★★★</div></div><div class="call-right"><div class="call-amount">20,000원</div><div><span class="badge badge-green">완료</span></div></div></div>
+          </div>
+        </div>
+
+        <!-- SCHEDULE -->
+        <div class="dash-section" id="section-schedule">
+          <div class="dash-section-title">일정 관리</div>
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:28px;margin-bottom:20px;">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:16px;">오늘 예약</div>
+            <div class="calls-list">
+              <div class="call-item">
+                <div style="background:var(--amber-100);color:#B45309;padding:8px 14px;border-radius:var(--radius-sm);font-weight:700;font-size:0.875rem;flex-shrink:0;">16:00</div>
+                <div class="call-info"><div class="call-name">한○○ 님</div><div class="call-meta">⏱ 30분 예약</div></div>
+                <div><span class="badge badge-amber">예약 확정</span></div>
+              </div>
+              <div class="call-item">
+                <div style="background:var(--primary-100);color:var(--primary);padding:8px 14px;border-radius:var(--radius-sm);font-weight:700;font-size:0.875rem;flex-shrink:0;">18:00</div>
+                <div class="call-info"><div class="call-name">조○○ 님</div><div class="call-meta">⏱ 20분 예약</div></div>
+                <div><span class="badge badge-purple">예약 확정</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:28px;">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:16px;">가능한 시간 설정</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="avail-slots"></div>
+          </div>
+        </div>
+
+        <!-- EARNINGS -->
+        <div class="dash-section" id="section-earnings">
+          <div class="dash-section-title">수익 / 정산</div>
+          <div class="withdraw-card">
+            <div class="balance-label">출금 가능 잔액</div>
+            <div class="balance-big">892,000원</div>
+            <div style="font-size:0.875rem;color:var(--gray-500);margin-bottom:24px;">다음 정산일: 2026-06-25</div>
+            <button class="btn btn-primary btn-lg" onclick="showToast('정산 신청이 완료되었습니다.','success')">정산 신청하기</button>
+          </div>
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:24px;margin-top:20px;">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:16px;">정산 내역</div>
+            <table style="width:100%;border-collapse:collapse;">
+              <thead><tr style="border-bottom:2px solid var(--gray-200);">
+                <th style="padding:10px;text-align:left;font-size:0.875rem;color:var(--gray-500);">날짜</th>
+                <th style="padding:10px;text-align:left;font-size:0.875rem;color:var(--gray-500);">내역</th>
+                <th style="padding:10px;text-align:right;font-size:0.875rem;color:var(--gray-500);">금액</th>
+                <th style="padding:10px;text-align:right;font-size:0.875rem;color:var(--gray-500);">상태</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--gray-100);"><td style="padding:14px 10px;font-size:0.9375rem;">2026-06-01</td><td style="padding:14px 10px;font-size:0.9375rem;">5월 정산</td><td style="padding:14px 10px;text-align:right;font-weight:700;">1,240,000원</td><td style="padding:14px 10px;text-align:right;"><span class="badge badge-green">완료</span></td></tr>
+                <tr style="border-bottom:1px solid var(--gray-100);"><td style="padding:14px 10px;font-size:0.9375rem;">2026-05-01</td><td style="padding:14px 10px;font-size:0.9375rem;">4월 정산</td><td style="padding:14px 10px;text-align:right;font-weight:700;">980,000원</td><td style="padding:14px 10px;text-align:right;"><span class="badge badge-green">완료</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="dash-section" id="section-reviews">
+          <div class="dash-section-title">리뷰 관리</div>
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:24px;margin-bottom:16px;display:flex;align-items:center;gap:32px;">
+            <div style="text-align:center;">
+              <div style="font-size:3.5rem;font-weight:800;color:var(--gray-900);">4.9</div>
+              <div style="color:var(--amber);font-size:1.5rem;">★★★★★</div>
+              <div style="font-size:0.875rem;color:var(--gray-500);">342개 리뷰</div>
+            </div>
+            <div style="flex:1;">
+              ${[5,4,3,2,1].map(n => `
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <span style="font-size:0.875rem;color:var(--gray-600);width:20px;">${n}★</span>
+                  <div style="flex:1;height:8px;background:var(--gray-100);border-radius:99px;overflow:hidden;">
+                    <div style="height:100%;background:var(--amber);border-radius:99px;width:${n===5?'78%':n===4?'16%':n===3?'4%':'2%'}"></div>
+                  </div>
+                  <span style="font-size:0.875rem;color:var(--gray-500);width:30px;">${n===5?'78%':n===4?'16%':n===3?'4%':'2%'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                <div class="avatar avatar-sm">박</div>
+                <div><strong style="font-size:0.9375rem;">박○○ 님</strong></div>
+                <div style="color:var(--amber);">★★★★★</div>
+                <div style="font-size:0.8125rem;color:var(--gray-400);margin-left:auto;">2026-06-10</div>
+              </div>
+              <p style="font-size:0.9375rem;color:var(--gray-700);line-height:1.7;">법률 문제가 너무 복잡해서 막막했는데, 명확하게 설명해주셔서 이해하기 쉬웠습니다. 적극 추천합니다!</p>
+            </div>
+            <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                <div class="avatar avatar-sm">이</div>
+                <div><strong style="font-size:0.9375rem;">이○○ 님</strong></div>
+                <div style="color:var(--amber);">★★★★★</div>
+                <div style="font-size:0.8125rem;color:var(--gray-400);margin-left:auto;">2026-06-08</div>
+              </div>
+              <p style="font-size:0.9375rem;color:var(--gray-700);line-height:1.7;">계약서 검토를 맡겼는데 꼼꼼하게 문제점을 찾아주셨어요. 덕분에 큰 피해를 예방할 수 있었습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE EDIT -->
+        <div class="dash-section" id="section-profile-edit">
+          <div class="dash-section-title">프로필 수정</div>
+          <div class="profile-edit-card">
+            <div class="profile-edit-grid">
+              <div class="form-group">
+                <label class="form-label">이름</label>
+                <input type="text" class="form-input" id="exp-name" value="김민준">
+              </div>
+              <div class="form-group">
+                <label class="form-label">직함</label>
+                <input type="text" class="form-input" id="exp-title" value="법무법인 소속 변호사">
+              </div>
+              <div class="form-group">
+                <label class="form-label">분야</label>
+                <select class="form-select" id="exp-category">
+                  <option value="legal" selected>법률</option>
+                  <option value="finance">금융/세무</option>
+                  <option value="it">IT/개발</option>
+                  <option value="medical">의료/건강</option>
+                  <option value="realty">부동산</option>
+                  <option value="psych">심리상담</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">분당 요금 (원)</label>
+                <input type="number" class="form-input" id="exp-price" value="2000" step="500" min="500">
+              </div>
+            </div>
+            <div class="form-group mt-16">
+              <label class="form-label">전문 분야 태그</label>
+              <div class="input-group"><input type="text" class="form-input" placeholder="태그 입력 후 Enter" id="tag-input" onkeydown="addTag(event)"></div>
+              <div class="tag-input-wrap mt-8" id="tag-list">
+                <span class="tag-chip">계약서 검토 <span class="tag-chip-del" onclick="this.parentElement.remove()">✕</span></span>
+                <span class="tag-chip">분쟁 해결 <span class="tag-chip-del" onclick="this.parentElement.remove()">✕</span></span>
+                <span class="tag-chip">기업법무 <span class="tag-chip-del" onclick="this.parentElement.remove()">✕</span></span>
+              </div>
+            </div>
+            <div class="form-group mt-16">
+              <label class="form-label">자기소개</label>
+              <textarea class="form-textarea" id="exp-bio" style="min-height:120px;">10년 경력의 기업법무 전문 변호사입니다.</textarea>
+            </div>
+            <hr class="divider">
+            <button class="btn btn-primary btn-lg" onclick="saveExpertProfile()">저장하기</button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer" id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!isLoggedIn()) { location.href = 'auth.html'; return; }
+      const user = currentUser;
+      document.getElementById('dash-avatar').textContent = user.name?.[0] || 'E';
+      document.getElementById('dash-name').textContent = user.name || '전문가';
+      renderChart();
+      renderAvailSlots();
+    });
+
+    function showSection(id) {
+      document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.dash-nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('section-' + id)?.classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function toggleOnline(cb) {
+      const label = document.getElementById('status-label');
+      if (cb.checked) { label.textContent = '🟢 통화 가능'; label.className = 'status-text status-on'; showToast('상태가 통화 가능으로 변경됐습니다.','success'); }
+      else { label.textContent = '⚫ 오프라인'; label.className = 'status-text status-off'; showToast('상태가 오프라인으로 변경됐습니다.','success'); }
+    }
+
+    function renderChart() {
+      const data = [128000, 95000, 160000, 80000, 204000, 135000, 130000];
+      const days = ['월','화','수','목','금','토','일'];
+      const max = Math.max(...data);
+      const el = document.getElementById('earnings-chart');
+      el.innerHTML = data.map((v, i) => `
+        <div class="chart-bar-wrap">
+          <div class="chart-val">${Math.round(v/1000)}k</div>
+          <div class="chart-bar" style="height:${(v/max)*110}px;" title="${v.toLocaleString()}원"></div>
+          <div class="chart-label">${days[i]}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderAvailSlots() {
+      const slots = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+      const active = new Set(['09:00','10:00','14:00','15:00','16:00']);
+      const el = document.getElementById('avail-slots');
+      el.innerHTML = slots.map(s => `
+        <div onclick="this.classList.toggle('selected')" class="duration-pill ${active.has(s)?'selected':''}" style="text-align:center;">${s}</div>
+      `).join('');
+    }
+
+    function addTag(e) {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const val = document.getElementById('tag-input').value.trim();
+      if (!val) return;
+      const chip = document.createElement('span');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `${val} <span class="tag-chip-del" onclick="this.parentElement.remove()">✕</span>`;
+      document.getElementById('tag-list').appendChild(chip);
+      document.getElementById('tag-input').value = '';
+    }
+
+    function saveExpertProfile() {
+      showToast('프로필이 저장되었습니다.', 'success');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전문가 찾기 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-hero {
+      background: linear-gradient(135deg, #4C1D95, #7C3AED);
+      padding: 100px 0 48px; color: white;
+    }
+    .page-hero h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 12px; }
+    .page-hero p { font-size: 1rem; color: rgba(255,255,255,0.8); margin-bottom: 28px; }
+    .page-hero .search-bar { max-width: 640px; }
+    .page-hero .search-bar { background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-xl); display: flex; }
+
+    .experts-layout { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; padding: 40px 0 80px; }
+
+    /* SIDEBAR FILTERS */
+    .filters-panel {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200); overflow: hidden; position: sticky; top: 80px;
+    }
+    .filters-header {
+      padding: 18px 20px; border-bottom: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .filters-header h3 { font-size: 1rem; font-weight: 700; }
+    .filter-reset { font-size: 0.875rem; color: var(--primary); cursor: pointer; font-weight: 600; }
+    .filter-section { padding: 20px; border-bottom: 1px solid var(--gray-100); }
+    .filter-section:last-child { border-bottom: none; }
+    .filter-section h4 { font-size: 0.875rem; font-weight: 700; color: var(--gray-700); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .filter-options { display: flex; flex-direction: column; gap: 10px; }
+    .filter-option { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .filter-option input[type="radio"], .filter-option input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+    .filter-option label { font-size: 0.9375rem; color: var(--gray-700); cursor: pointer; flex: 1; }
+    .filter-option-count { font-size: 0.8125rem; color: var(--gray-400); }
+    .filter-range { display: flex; flex-direction: column; gap: 10px; }
+    .range-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .range-inputs input { padding: 8px 12px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 0.875rem; font-family: inherit; outline: none; }
+    .range-inputs input:focus { border-color: var(--primary); }
+
+    /* MAIN CONTENT */
+    .experts-toolbar {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .result-count { font-size: 0.9375rem; color: var(--gray-500); }
+    .result-count strong { color: var(--gray-900); }
+    .sort-select {
+      padding: 8px 14px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm);
+      font-size: 0.9375rem; font-family: inherit; cursor: pointer; outline: none;
+      appearance: none; padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .experts-grid-main { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    /* CATEGORY PILLS */
+    .category-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .category-pill {
+      padding: 8px 18px; border-radius: var(--radius-full); border: 1.5px solid var(--gray-300);
+      font-size: 0.9375rem; font-weight: 500; color: var(--gray-600);
+      cursor: pointer; transition: var(--transition); background: var(--white);
+    }
+    .category-pill:hover { border-color: var(--primary); color: var(--primary); }
+    .category-pill.active { border-color: var(--primary); background: var(--primary); color: white; }
+
+    /* EXPERT LIST CARD (horizontal) */
+    .expert-list-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200); padding: 20px;
+      display: flex; gap: 16px; cursor: pointer; transition: var(--transition);
+    }
+    .expert-list-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+    .expert-list-avatar {
+      width: 90px; height: 90px; border-radius: var(--radius-md); flex-shrink: 0;
+      background: var(--primary-100); display: flex; align-items: center; justify-content: center;
+      font-size: 2.25rem; font-weight: 700; color: var(--primary);
+    }
+    .expert-list-body { flex: 1; min-width: 0; }
+    .expert-list-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .expert-list-name-row { display: flex; align-items: center; gap: 8px; }
+    .expert-list-name { font-size: 1.0625rem; font-weight: 700; color: var(--gray-900); }
+    .expert-list-title { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 8px; }
+    .expert-list-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .expert-list-meta { display: flex; align-items: center; gap: 16px; font-size: 0.875rem; color: var(--gray-500); }
+    .expert-list-price { text-align: right; flex-shrink: 0; }
+    .expert-list-price .price-value { font-size: 1.125rem; font-weight: 700; color: var(--primary); white-space: nowrap; }
+    .expert-list-price .price-label { font-size: 0.8125rem; color: var(--gray-400); }
+
+    /* PAGINATION */
+    .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 40px; }
+    .page-btn {
+      width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-300);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9375rem;
+      cursor: pointer; transition: var(--transition); color: var(--gray-600); background: white;
+    }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { border-color: var(--primary); background: var(--primary); color: white; }
+
+    .no-results { text-align: center; padding: 60px 20px; color: var(--gray-500); }
+    .no-results-emoji { font-size: 3rem; margin-bottom: 16px; }
+
+    @media (max-width: 900px) {
+      .experts-layout { grid-template-columns: 1fr; }
+      .filters-panel { position: static; }
+      .experts-grid-main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="experts">
+
+  <header class="navbar" id="main-navbar"></header>
+
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <h1>전문가 찾기</h1>
+      <p>1,800명 이상의 검증된 전문가 중 나에게 딱 맞는 분을 찾아보세요</p>
+      <div class="search-bar" style="max-width:640px;">
+        <div class="search-field">
+          <span class="search-field-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="전문가 이름, 키워드로 검색..." id="search-input">
+        </div>
+        <button class="search-submit" onclick="applyFilters()">검색</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="experts-layout">
+
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="filters-panel">
+          <div class="filters-header">
+            <h3>🔽 필터</h3>
+            <span class="filter-reset" onclick="resetFilters()">초기화</span>
+          </div>
+
+          <!-- 분야 -->
+          <div class="filter-section">
+            <h4>전문 분야</h4>
+            <div class="filter-options" id="cat-filter">
+              <label class="filter-option">
+                <input type="radio" name="cat" value="all" checked onchange="applyFilters()">
+                <label>전체</label>
+                <span class="filter-option-count">1,800</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 온라인 -->
+          <div class="filter-section">
+            <h4>상태</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" id="online-only" onchange="applyFilters()">
+                <label for="online-only">🟢 지금 통화 가능만 보기</label>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" id="certified-only" onchange="applyFilters()">
+                <label for="certified-only">✅ 인증 전문가만 보기</label>
+              </label>
+            </div>
+          </div>
+
+          <!-- 가격 -->
+          <div class="filter-section">
+            <h4>분당 요금</h4>
+            <div class="filter-range">
+              <div class="range-inputs">
+                <input type="number" id="price-min" placeholder="최소" min="0" step="500" onchange="applyFilters()">
+                <input type="number" id="price-max" placeholder="최대" min="0" step="500" onchange="applyFilters()">
+              </div>
+            </div>
+          </div>
+
+          <!-- 평점 -->
+          <div class="filter-section">
+            <h4>최소 평점</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="radio" name="rating" value="0" checked onchange="applyFilters()">
+                <label>전체</label>
+              </label>
+              <label class="filter-option">
+                <input type="radio" name="rating" value="4.5" onchange="applyFilters()">
+                <label>⭐ 4.5 이상</label>
+              </label>
+              <label class="filter-option">
+                <input type="radio" name="rating" value="4.8" onchange="applyFilters()">
+                <label>⭐ 4.8 이상</label>
+              </label>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <!-- Category pills -->
+        <div class="category-pills" id="category-pills"></div>
+
+        <!-- Toolbar -->
+        <div class="experts-toolbar">
+          <div class="result-count" id="result-count">전문가 <strong>0</strong>명</div>
+          <select class="sort-select" id="sort-select" onchange="applyFilters()">
+            <option value="rating">평점 높은순</option>
+            <option value="review">리뷰 많은순</option>
+            <option value="price_asc">요금 낮은순</option>
+            <option value="price_desc">요금 높은순</option>
+          </select>
+        </div>
+
+        <!-- Expert list -->
+        <div id="experts-list"></div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </main>
+
+    </div>
+  </div>
+
+  <footer class="footer" id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const PER_PAGE = 6;
+    let currentPage = 1;
+    let filtered = [...EXPERTS];
+
+    // Read URL params
+    const params = new URLSearchParams(location.search);
+    const initCat = params.get('cat') || 'all';
+    const initQ   = params.get('q') || '';
+    if (initQ) document.getElementById('search-input').value = initQ;
+
+    // Render category pills
+    const pillsEl = document.getElementById('category-pills');
+    pillsEl.innerHTML = `<button class="category-pill ${initCat === 'all' ? 'active' : ''}" onclick="setCat('all')">전체</button>` +
+      CATEGORIES.map(c => `<button class="category-pill ${initCat === c.id ? 'active' : ''}" onclick="setCat('${c.id}')">${c.emoji} ${c.name}</button>`).join('');
+
+    // Render sidebar cat filters
+    const catFilterEl = document.getElementById('cat-filter');
+    catFilterEl.innerHTML = `<label class="filter-option"><input type="radio" name="cat" value="all" ${initCat === 'all' ? 'checked' : ''} onchange="applyFilters()"><label>전체</label><span class="filter-option-count">1,800</span></label>` +
+      CATEGORIES.map(c => `<label class="filter-option"><input type="radio" name="cat" value="${c.id}" ${initCat === c.id ? 'checked' : ''} onchange="setCat('${c.id}')"><label>${c.emoji} ${c.name}</label><span class="filter-option-count">${c.count}</span></label>`).join('');
+
+    function setCat(catId) {
+      document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+      const activePill = [...document.querySelectorAll('.category-pill')].find(p => p.textContent.trim().includes(catId === 'all' ? '전체' : CATEGORIES.find(c=>c.id===catId)?.name || ''));
+      activePill?.classList.add('active');
+      const radio = document.querySelector(`input[name="cat"][value="${catId}"]`);
+      if (radio) radio.checked = true;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const cat = document.querySelector('input[name="cat"]:checked')?.value || 'all';
+      const onlineOnly = document.getElementById('online-only').checked;
+      const certOnly = document.getElementById('certified-only').checked;
+      const minRating = parseFloat(document.querySelector('input[name="rating"]:checked')?.value || '0');
+      const minPrice = parseInt(document.getElementById('price-min').value) || 0;
+      const maxPrice = parseInt(document.getElementById('price-max').value) || Infinity;
+      const sort = document.getElementById('sort-select').value;
+
+      filtered = EXPERTS.filter(e => {
+        if (cat !== 'all' && e.category !== cat) return false;
+        if (onlineOnly && !e.isOnline) return false;
+        if (certOnly && !e.isCertified) return false;
+        if (e.rating < minRating) return false;
+        if (e.pricePerMin < minPrice || e.pricePerMin > maxPrice) return false;
+        if (q && !e.name.includes(q) && !e.title.toLowerCase().includes(q) && !e.tags.some(t => t.toLowerCase().includes(q))) return false;
+        return true;
+      });
+
+      if (sort === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+      else if (sort === 'review') filtered.sort((a, b) => b.reviewCount - a.reviewCount);
+      else if (sort === 'price_asc') filtered.sort((a, b) => a.pricePerMin - b.pricePerMin);
+      else if (sort === 'price_desc') filtered.sort((a, b) => b.pricePerMin - a.pricePerMin);
+
+      currentPage = 1;
+      renderExperts();
+    }
+
+    function renderExperts() {
+      const total = filtered.length;
+      document.getElementById('result-count').innerHTML = `전문가 <strong>${total}</strong>명`;
+
+      const start = (currentPage - 1) * PER_PAGE;
+      const page = filtered.slice(start, start + PER_PAGE);
+
+      const el = document.getElementById('experts-list');
+
+      if (page.length === 0) {
+        el.innerHTML = `<div class="no-results"><div class="no-results-emoji">🔍</div><div>검색 조건에 맞는 전문가가 없습니다.<br>필터를 조정해보세요.</div></div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      el.innerHTML = page.map(e => `
+        <div class="expert-list-card" onclick="location.href='expert-detail.html?id=${e.id}'" style="margin-bottom:16px;">
+          <div class="expert-list-avatar">${e.initials}</div>
+          <div class="expert-list-body">
+            <div class="expert-list-top">
+              <div>
+                <div class="expert-list-name-row">
+                  <span class="expert-list-name">${e.name}</span>
+                  ${e.isCertified ? '<span class="badge badge-purple" style="font-size:0.75rem;padding:2px 8px;">인증</span>' : ''}
+                  ${e.isOnline ? '<span style="font-size:0.75rem;color:var(--green);font-weight:600;">🟢 통화 가능</span>' : '<span style="font-size:0.75rem;color:var(--gray-400);">⚫ 오프라인</span>'}
+                </div>
+                <div class="expert-list-title">${e.title}</div>
+              </div>
+              <div class="expert-list-price">
+                <div class="price-value">${formatPrice(e.pricePerMin)}원</div>
+                <div class="price-label">/ 분당</div>
+              </div>
+            </div>
+            <div class="expert-list-tags">${e.tags.map(t => `<span class="expert-tag">${t}</span>`).join('')}</div>
+            <div class="expert-list-meta">
+              <span><span class="stars" style="color:var(--amber);">${renderStars(e.rating)}</span> ${e.rating.toFixed(1)} (${e.reviewCount.toLocaleString()}개)</span>
+              <span>📞 ${e.callCount.toLocaleString()}건</span>
+              <span>⏱ ${e.responseTime}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Pagination
+      const totalPages = Math.ceil(total / PER_PAGE);
+      let pgHtml = '';
+      if (totalPages > 1) {
+        if (currentPage > 1) pgHtml += `<button class="page-btn" onclick="goPage(${currentPage-1})">‹</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          pgHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+        }
+        if (currentPage < totalPages) pgHtml += `<button class="page-btn" onclick="goPage(${currentPage+1})">›</button>`;
+      }
+      document.getElementById('pagination').innerHTML = pgHtml;
+    }
+
+    function goPage(n) { currentPage = n; renderExperts(); window.scrollTo(0, 300); }
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('online-only').checked = false;
+      document.getElementById('certified-only').checked = false;
+      document.getElementById('price-min').value = '';
+      document.getElementById('price-max').value = '';
+      document.querySelector('input[name="cat"][value="all"]').checked = true;
+      document.querySelector('input[name="rating"][value="0"]').checked = true;
+      applyFilters();
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+
+    applyFilters();
+    if (initCat !== 'all') {
+      const r = document.querySelector(`input[name="cat"][value="${initCat}"]`);
+      if (r) r.checked = true;
+      setTimeout(applyFilters, 50);
+    }
+  </script>
+</body>
+</html>
