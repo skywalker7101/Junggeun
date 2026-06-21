@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 실패 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .result-card { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 60px 48px; text-align: center; max-width: 420px; width: 100%; margin: 24px; }
+    .result-icon { font-size: 5rem; margin-bottom: 24px; }
+    .result-title { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+    .result-desc { font-size: 1rem; color: var(--gray-500); line-height: 1.8; margin-bottom: 32px; }
+    .err-box { background: var(--red-100); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; font-size: 0.9375rem; color: var(--red); }
+  </style>
+</head>
+<body>
+  <div class="result-card">
+    <div class="result-icon">😢</div>
+    <div class="result-title">결제에 실패했습니다</div>
+    <p class="result-desc">결제가 완료되지 않았습니다.<br>다시 시도해주세요.</p>
+    <div class="err-box" id="err-msg">결제가 취소되었거나 오류가 발생했습니다.</div>
+    <button onclick="history.back()" class="btn btn-primary btn-full btn-lg">다시 결제하기</button>
+    <a href="experts.html" class="btn btn-outline btn-full" style="margin-top:10px;">전문가 목록으로</a>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const msg = params.get('message');
+    if (msg) document.getElementById('err-msg').textContent = decodeURIComponent(msg);
+  </script>
+</body>
+</html>

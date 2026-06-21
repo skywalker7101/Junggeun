@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 완료 - Y-Call</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .result-card { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 60px 48px; text-align: center; max-width: 480px; width: 100%; margin: 24px; }
+    .result-icon { font-size: 5rem; margin-bottom: 24px; }
+    .result-title { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+    .result-desc { font-size: 1rem; color: var(--gray-500); line-height: 1.8; margin-bottom: 32px; }
+    .result-box { background: var(--gray-50); border-radius: var(--radius-md); padding: 20px; margin-bottom: 28px; text-align: left; }
+    .result-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.9375rem; border-bottom: 1px solid var(--gray-200); }
+    .result-row:last-child { border-bottom: none; font-weight: 700; font-size: 1rem; }
+    .result-row span:last-child { color: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="result-card">
+    <div class="result-icon">🎉</div>
+    <div class="result-title">결제가 완료됐습니다!</div>
+    <p class="result-desc">예약이 확정되었습니다.<br>예약 시간에 맞춰 전문가가 연락드립니다.</p>
+    <div class="result-box" id="result-info">
+      <div style="text-align:center;color:var(--gray-400);padding:10px;">결제 정보를 불러오는 중...</div>
+    </div>
+    <a href="dashboard-user.html" class="btn btn-primary btn-full btn-lg">예약 내역 확인하기</a>
+    <a href="experts.html" class="btn btn-outline btn-full" style="margin-top:10px;">전문가 더 보기</a>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const paymentKey = params.get('paymentKey');
+    const orderId    = params.get('orderId');
+    const amount     = params.get('amount');
+
+    // Parse booking info from orderId
+    const pending = JSON.parse(sessionStorage.getItem('ycall_pending_booking') || 'null');
+
+    async function confirmPayment() {
+      try {
+        const user = await authReady;
+        if (!user) { location.href = 'auth.html'; return; }
+
+        // Save booking to Firestore
+        if (pending) {
+          await saveBooking({
+            userId: user.uid,
+            userName: pending.userName || user.displayName || '사용자',
+            expertId: pending.expertId,
+            expertName: pending.expertName,
+            expertTitle: pending.expertTitle,
+            duration: pending.duration,
+            time: pending.time,
+            total: parseInt(amount) || pending.total,
+            paymentKey,
+            orderId,
+            status: 'upcoming',
+            date: new Date().toISOString().split('T')[0],
+          });
+          sessionStorage.removeItem('ycall_pending_booking');
+        }
+
+        // Show info
+        const expert = pending ? getExpertById(pending.expertId) : null;
+        document.getElementById('result-info').innerHTML = `
+          <div class="result-row"><span>전문가</span><span>${pending?.expertName || '-'}</span></div>
+          <div class="result-row"><span>예약 시간</span><span>${pending?.time || '-'}</span></div>
+          <div class="result-row"><span>통화 시간</span><span>${pending?.duration || '-'}분</span></div>
+          <div class="result-row"><span>주문 번호</span><span style="font-size:0.8125rem;color:var(--gray-500);">${orderId}</span></div>
+          <div class="result-row"><span>결제 금액</span><span>${parseInt(amount||0).toLocaleString('ko-KR')}원</span></div>
+        `;
+      } catch(e) {
+        console.error(e);
+        showToast('결제 확인 중 오류가 발생했습니다.', 'error');
+      }
+    }
+
+    confirmPayment();
+  </script>
+</body>
+</html>

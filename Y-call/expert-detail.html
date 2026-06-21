@@ -7,64 +7,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .detail-layout {
-      display: grid; grid-template-columns: 1fr 360px; gap: 32px;
-      padding: 100px 0 80px; align-items: start;
-    }
-
-    /* LEFT PANEL */
-    .expert-profile-card {
-      background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200);
-      overflow: hidden; margin-bottom: 24px;
-    }
-    .profile-header {
-      background: linear-gradient(135deg, #4C1D95, #7C3AED);
-      padding: 40px 32px; display: flex; gap: 24px; align-items: flex-end;
-    }
-    .profile-avatar {
-      width: 110px; height: 110px; border-radius: var(--radius-lg);
-      background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; font-weight: 700; color: white; flex-shrink: 0;
-    }
+    .detail-layout { display: grid; grid-template-columns: 1fr 360px; gap: 32px; padding: 100px 0 80px; align-items: start; }
+    .expert-profile-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200); overflow: hidden; margin-bottom: 24px; }
+    .profile-header { background: linear-gradient(135deg, #4C1D95, #7C3AED); padding: 40px 32px; display: flex; gap: 24px; align-items: flex-end; }
+    .profile-avatar { width: 110px; height: 110px; border-radius: var(--radius-lg); background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; color: white; flex-shrink: 0; }
     .profile-meta { color: white; }
     .profile-name { font-size: 1.75rem; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
     .profile-title { font-size: 1rem; color: rgba(255,255,255,0.8); margin-bottom: 12px; }
     .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .profile-tag {
-      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-      color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.875rem;
-    }
-
-    .profile-stats {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      border-bottom: 1px solid var(--gray-200);
-    }
-    .profile-stat {
-      padding: 20px; text-align: center; border-right: 1px solid var(--gray-200);
-    }
+    .profile-tag { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.875rem; }
+    .profile-stats { display: grid; grid-template-columns: repeat(4,1fr); border-bottom: 1px solid var(--gray-200); }
+    .profile-stat { padding: 20px; text-align: center; border-right: 1px solid var(--gray-200); }
     .profile-stat:last-child { border-right: none; }
     .profile-stat-val { font-size: 1.375rem; font-weight: 800; color: var(--gray-900); }
     .profile-stat-label { font-size: 0.8125rem; color: var(--gray-500); margin-top: 2px; }
-
     .profile-body { padding: 28px 32px; }
     .profile-section { margin-bottom: 28px; }
     .profile-section h3 { font-size: 1.0625rem; font-weight: 700; color: var(--gray-900); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-100); }
     .profile-bio { font-size: 0.9375rem; color: var(--gray-600); line-height: 1.8; }
-    .career-list, .edu-list { display: flex; flex-direction: column; gap: 8px; }
-    .career-item, .edu-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      font-size: 0.9375rem; color: var(--gray-700);
-    }
+    .career-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9375rem; color: var(--gray-700); margin-bottom: 8px; }
     .career-item::before { content: '🏢'; flex-shrink: 0; }
+    .edu-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9375rem; color: var(--gray-700); margin-bottom: 8px; }
     .edu-item::before { content: '🎓'; flex-shrink: 0; }
-
-    /* REVIEWS */
     .reviews-section { background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200); padding: 28px 32px; }
-    .reviews-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .reviews-avg { font-size: 3rem; font-weight: 800; color: var(--gray-900); }
-    .reviews-stars { color: var(--amber); font-size: 1.5rem; }
-    .reviews-count { font-size: 0.9375rem; color: var(--gray-500); }
     .review-item { padding: 20px 0; border-bottom: 1px solid var(--gray-100); }
     .review-item:last-child { border-bottom: none; }
     .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
@@ -72,84 +37,48 @@
     .review-date { font-size: 0.8125rem; color: var(--gray-400); margin-left: auto; }
     .review-stars { color: var(--amber); font-size: 0.9375rem; }
     .review-text { font-size: 0.9375rem; color: var(--gray-700); line-height: 1.7; }
-    .review-minutes { font-size: 0.8125rem; color: var(--gray-400); margin-top: 6px; }
 
-    /* RIGHT PANEL - BOOKING */
-    .booking-card {
-      background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200);
-      overflow: hidden; position: sticky; top: 80px;
-      box-shadow: var(--shadow-lg);
-    }
-    .booking-header {
-      background: var(--primary-50); padding: 20px 24px; border-bottom: 1px solid var(--primary-100);
-    }
-    .booking-price-row { display: flex; align-items: baseline; gap: 6px; }
+    /* BOOKING CARD */
+    .booking-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200); overflow: hidden; position: sticky; top: 80px; box-shadow: var(--shadow-lg); }
+    .booking-header { background: var(--primary-50); padding: 20px 24px; border-bottom: 1px solid var(--primary-100); }
     .booking-price-big { font-size: 2rem; font-weight: 800; color: var(--primary); }
-    .booking-price-unit { font-size: 1rem; color: var(--gray-500); }
-    .booking-status { margin-top: 6px; display: flex; align-items: center; gap: 6px; font-size: 0.875rem; font-weight: 600; }
     .booking-body { padding: 24px; }
-    .duration-selector { margin-bottom: 20px; }
-    .duration-selector h4 { font-size: 0.9375rem; font-weight: 700; color: var(--gray-700); margin-bottom: 12px; }
-    .duration-pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .duration-pill {
-      padding: 10px; text-align: center; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-300); cursor: pointer; transition: var(--transition);
-    }
+    .duration-pills { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .duration-pill { padding: 10px; text-align: center; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-300); cursor: pointer; transition: var(--transition); }
     .duration-pill:hover { border-color: var(--primary); color: var(--primary); }
     .duration-pill.selected { border-color: var(--primary); background: var(--primary-50); color: var(--primary); font-weight: 600; }
     .duration-pill .min { font-size: 1rem; font-weight: 700; }
-    .duration-pill .price { font-size: 0.75rem; color: inherit; opacity: 0.8; }
-
-    .time-selector { margin-bottom: 20px; }
-    .time-selector h4 { font-size: 0.9375rem; font-weight: 700; color: var(--gray-700); margin-bottom: 12px; }
-    .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .time-slot {
-      padding: 8px 4px; text-align: center; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-300); cursor: pointer; font-size: 0.875rem;
-      transition: var(--transition); font-weight: 500;
-    }
+    .duration-pill .price { font-size: 0.75rem; opacity: 0.8; }
+    .time-slots { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 20px; }
+    .time-slot { padding: 8px 4px; text-align: center; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-300); cursor: pointer; font-size: 0.875rem; transition: var(--transition); font-weight: 500; }
     .time-slot:hover { border-color: var(--primary); color: var(--primary); }
     .time-slot.selected { border-color: var(--primary); background: var(--primary); color: white; }
-
-    .booking-summary {
-      background: var(--gray-50); border-radius: var(--radius-md);
-      padding: 16px; margin-bottom: 20px;
-    }
+    .booking-summary { background: var(--gray-50); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; }
     .booking-summary-row { display: flex; justify-content: space-between; font-size: 0.9375rem; padding: 6px 0; }
     .booking-summary-row.total { font-weight: 700; font-size: 1rem; border-top: 1px solid var(--gray-200); padding-top: 10px; margin-top: 4px; }
-    .booking-cta .btn { margin-bottom: 10px; }
-    .booking-note { font-size: 0.8125rem; color: var(--gray-400); text-align: center; line-height: 1.6; }
 
-    @media (max-width: 900px) {
-      .detail-layout { grid-template-columns: 1fr; }
-      .booking-card { position: static; }
-      .profile-stats { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 600px) {
-      .profile-header { flex-direction: column; align-items: flex-start; }
-      .profile-stats { grid-template-columns: repeat(2, 1fr); }
-    }
+    /* PAYMENT MODAL */
+    .pay-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
+    .pay-modal-overlay.hidden { display: none; }
+    .pay-modal { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .pay-modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+    .pay-modal-body { padding: 24px; }
+
+    @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; } .booking-card { position: static; } .profile-stats { grid-template-columns: repeat(2,1fr); } }
   </style>
 </head>
 <body data-page="">
-
   <header class="navbar" id="main-navbar"></header>
 
   <div class="container">
-    <div id="breadcrumb" style="padding-top:80px;padding-bottom:0;font-size:0.9375rem;color:var(--gray-500);margin-top:16px;">
+    <div id="breadcrumb" style="padding-top:80px;font-size:0.9375rem;color:var(--gray-500);margin-top:16px;">
       <a href="experts.html" style="color:var(--primary);">전문가 찾기</a> › <span id="bc-name"></span>
     </div>
     <div class="detail-layout">
-      <!-- LEFT -->
       <div>
-        <!-- Profile card -->
         <div class="expert-profile-card" id="profile-card"></div>
-
-        <!-- Reviews -->
         <div class="reviews-section" id="reviews-section"></div>
       </div>
-
-      <!-- RIGHT - Booking -->
       <div>
         <div class="booking-card" id="booking-card"></div>
       </div>
@@ -159,23 +88,31 @@
   <footer class="footer" id="main-footer"></footer>
   <div id="toast-container"></div>
 
-  <!-- BOOKING MODAL -->
-  <div class="modal-overlay hidden" id="booking-modal">
-    <div class="modal" style="max-width:460px;">
-      <div class="modal-header">
-        <h3>📞 예약 확인 및 결제</h3>
-        <button class="modal-close" onclick="closeModal()">✕</button>
+  <!-- PAYMENT MODAL -->
+  <div class="pay-modal-overlay hidden" id="pay-modal">
+    <div class="pay-modal">
+      <div class="pay-modal-header">
+        <h3 style="font-size:1.125rem;">💳 결제</h3>
+        <button onclick="closePay()" style="width:32px;height:32px;border-radius:50%;background:var(--gray-100);border:none;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
-      <div class="modal-body" id="modal-body"></div>
+      <div class="pay-modal-body" id="pay-modal-body"></div>
     </div>
   </div>
 
+  <!-- Firebase + Toss -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://js.tosspayments.com/v1/payment"></script>
+  <script src="js/firebase.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
-    const params = new URLSearchParams(location.search);
-    const expertId = parseInt(params.get('id'));
-    const expert = getExpertById(expertId);
+    const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
+
+    const params    = new URLSearchParams(location.search);
+    const expertId  = parseInt(params.get('id'));
+    const expert    = getExpertById(expertId);
 
     if (!expert) {
       document.querySelector('.container').innerHTML = '<div style="padding:120px 0;text-align:center;"><h2>전문가를 찾을 수 없습니다.</h2><a href="experts.html" class="btn btn-primary" style="margin-top:20px;">목록으로</a></div>';
@@ -184,66 +121,39 @@
       document.getElementById('bc-name').textContent = expert.name;
 
       let selectedDuration = 15;
-      let selectedTime = null;
+      let selectedTime     = null;
 
-      // ===== RENDER PROFILE =====
+      // ===== PROFILE =====
       document.getElementById('profile-card').innerHTML = `
         <div class="profile-header">
           <div class="profile-avatar">${expert.initials}</div>
           <div class="profile-meta">
-            <div class="profile-name">
-              ${expert.name}
-              ${expert.isCertified ? '<span class="badge badge-green" style="font-size:0.75rem;">✅ 인증</span>' : ''}
-            </div>
+            <div class="profile-name">${expert.name}${expert.isCertified?'<span class="badge badge-green" style="font-size:0.75rem;">✅ 인증</span>':''}</div>
             <div class="profile-title">${expert.title}</div>
-            <div class="profile-tags">${expert.tags.map(t => `<span class="profile-tag">${t}</span>`).join('')}</div>
+            <div class="profile-tags">${expert.tags.map(t=>`<span class="profile-tag">${t}</span>`).join('')}</div>
           </div>
         </div>
         <div class="profile-stats">
-          <div class="profile-stat">
-            <div class="profile-stat-val" style="color:var(--amber);">${expert.rating.toFixed(1)} ★</div>
-            <div class="profile-stat-label">평점</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-val">${expert.reviewCount.toLocaleString()}</div>
-            <div class="profile-stat-label">리뷰</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-val">${expert.callCount.toLocaleString()}</div>
-            <div class="profile-stat-label">통화건수</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-val">${expert.responseTime}</div>
-            <div class="profile-stat-label">응답시간</div>
-          </div>
+          <div class="profile-stat"><div class="profile-stat-val" style="color:var(--amber);">${expert.rating.toFixed(1)} ★</div><div class="profile-stat-label">평점</div></div>
+          <div class="profile-stat"><div class="profile-stat-val">${expert.reviewCount.toLocaleString()}</div><div class="profile-stat-label">리뷰</div></div>
+          <div class="profile-stat"><div class="profile-stat-val">${expert.callCount.toLocaleString()}</div><div class="profile-stat-label">통화건수</div></div>
+          <div class="profile-stat"><div class="profile-stat-val">${expert.responseTime}</div><div class="profile-stat-label">응답시간</div></div>
         </div>
         <div class="profile-body">
-          <div class="profile-section">
-            <h3>소개</h3>
-            <p class="profile-bio">${expert.bio}</p>
-          </div>
-          <div class="profile-section">
-            <h3>경력</h3>
-            <div class="career-list">${expert.career.map(c => `<div class="career-item">${c}</div>`).join('')}</div>
-          </div>
-          <div class="profile-section">
-            <h3>학력/자격</h3>
-            <div class="edu-list">${expert.education.map(e => `<div class="edu-item">${e}</div>`).join('')}</div>
-          </div>
-        </div>
-      `;
+          <div class="profile-section"><h3>소개</h3><p class="profile-bio">${expert.bio}</p></div>
+          <div class="profile-section"><h3>경력</h3>${expert.career.map(c=>`<div class="career-item">${c}</div>`).join('')}</div>
+          <div class="profile-section"><h3>학력/자격</h3>${expert.education.map(e=>`<div class="edu-item">${e}</div>`).join('')}</div>
+        </div>`;
 
-      // ===== RENDER REVIEWS =====
+      // ===== REVIEWS =====
       const reviews = getReviewsByExpertId(expertId);
       document.getElementById('reviews-section').innerHTML = `
-        <div class="reviews-header">
-          <div>
-            <div class="reviews-avg">${expert.rating.toFixed(1)}</div>
-            <div class="reviews-stars">${renderStars(expert.rating)}</div>
-            <div class="reviews-count">리뷰 ${expert.reviewCount.toLocaleString()}개</div>
-          </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+          <div><div style="font-size:3rem;font-weight:800;color:var(--gray-900);">${expert.rating.toFixed(1)}</div>
+          <div style="color:var(--amber);font-size:1.375rem;">${renderStars(expert.rating)}</div>
+          <div style="font-size:0.875rem;color:var(--gray-500);">리뷰 ${expert.reviewCount.toLocaleString()}개</div></div>
         </div>
-        ${reviews.length > 0 ? reviews.map(r => `
+        ${reviews.map(r=>`
           <div class="review-item">
             <div class="review-header">
               <div class="avatar avatar-sm">${r.userName[0]}</div>
@@ -252,158 +162,119 @@
               <div class="review-date">${r.date}</div>
             </div>
             <p class="review-text">${r.comment}</p>
-            <div class="review-minutes">⏱ 상담 시간: ${r.callMinutes}분</div>
-          </div>
-        `).join('') : '<p style="color:var(--gray-400);text-align:center;padding:20px;">아직 리뷰가 없습니다.</p>'}
-      `;
+            <div style="font-size:0.8125rem;color:var(--gray-400);margin-top:6px;">⏱ 상담 ${r.callMinutes}분</div>
+          </div>`).join('')}`;
 
-      // ===== RENDER BOOKING CARD =====
-      function renderBookingCard() {
+      // ===== BOOKING CARD =====
+      function renderBooking() {
         const total = expert.pricePerMin * selectedDuration;
         document.getElementById('booking-card').innerHTML = `
           <div class="booking-header">
-            <div class="booking-price-row">
+            <div style="display:flex;align-items:baseline;gap:6px;">
               <span class="booking-price-big">${formatPrice(expert.pricePerMin)}원</span>
-              <span class="booking-price-unit">/ 분</span>
+              <span style="color:var(--gray-500);">/ 분</span>
             </div>
-            <div class="booking-status ${expert.isOnline ? '' : ''}">
-              ${expert.isOnline ? '<span style="color:var(--green);">🟢 지금 바로 통화 가능</span>' : '<span style="color:var(--gray-400);">⚫ 현재 오프라인 - 예약만 가능</span>'}
+            <div style="margin-top:6px;font-size:0.875rem;font-weight:600;">
+              ${expert.isOnline?'<span style="color:var(--green);">🟢 지금 통화 가능</span>':'<span style="color:var(--gray-400);">⚫ 오프라인</span>'}
             </div>
           </div>
           <div class="booking-body">
-            <div class="duration-selector">
-              <h4>통화 시간 선택</h4>
-              <div class="duration-pills">
-                ${[10,15,20,30,45,60].map(m => `
-                  <div class="duration-pill ${selectedDuration === m ? 'selected' : ''}" onclick="selectDuration(${m})">
-                    <div class="min">${m}분</div>
-                    <div class="price">${formatPrice(expert.pricePerMin * m)}원</div>
-                  </div>
-                `).join('')}
-              </div>
+            <div style="font-size:0.9375rem;font-weight:700;color:var(--gray-700);margin-bottom:10px;">통화 시간 선택</div>
+            <div class="duration-pills">
+              ${[10,15,20,30,45,60].map(m=>`
+                <div class="duration-pill ${selectedDuration===m?'selected':''}" onclick="selDur(${m})">
+                  <div class="min">${m}분</div>
+                  <div class="price">${formatPrice(expert.pricePerMin*m)}원</div>
+                </div>`).join('')}
             </div>
-
-            <div class="time-selector">
-              <h4>예약 시간 선택</h4>
-              <div class="time-slots">
-                ${expert.availableSlots.map(t => `
-                  <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
-                `).join('')}
-              </div>
+            <div style="font-size:0.9375rem;font-weight:700;color:var(--gray-700);margin-bottom:10px;">예약 시간 선택</div>
+            <div class="time-slots">
+              ${expert.availableSlots.map(t=>`
+                <div class="time-slot ${selectedTime===t?'selected':''}" onclick="selTime('${t}')">${t}</div>`).join('')}
             </div>
-
             <div class="booking-summary">
               <div class="booking-summary-row"><span>분당 요금</span><span>${formatPrice(expert.pricePerMin)}원</span></div>
               <div class="booking-summary-row"><span>통화 시간</span><span>${selectedDuration}분</span></div>
               <div class="booking-summary-row total"><span>총 결제금액</span><span style="color:var(--primary);">${formatPrice(total)}원</span></div>
             </div>
-
-            <div class="booking-cta">
-              <button class="btn btn-green btn-full btn-lg" onclick="openBooking()">
-                💳 지금 예약하기
-              </button>
-              ${expert.isOnline ? `<button class="btn btn-primary btn-full btn-lg" onclick="openBooking(true)" style="margin-top:8px;">
-                📞 바로 통화하기
-              </button>` : ''}
-            </div>
-            <p class="booking-note">
-              ✅ 안전 결제 보장 · 취소 시 전액 환불<br>
-              📞 결제 완료 후 전화번호 안내됩니다
-            </p>
-          </div>
-        `;
+            <button class="btn btn-primary btn-full btn-lg" onclick="openPay(false)" style="margin-bottom:8px;">💳 예약하고 결제하기</button>
+            ${expert.isOnline?`<button class="btn btn-green btn-full btn-lg" onclick="openPay(true)">📞 바로 통화하기</button>`:''}
+            <p style="font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-top:12px;line-height:1.6;">✅ 안전결제 · 취소 시 전액 환불<br>📞 결제 완료 후 전화번호 안내</p>
+          </div>`;
       }
 
-      function selectDuration(m) { selectedDuration = m; renderBookingCard(); }
-      function selectTime(t) { selectedTime = t; renderBookingCard(); }
-      window.selectDuration = selectDuration;
-      window.selectTime = selectTime;
+      function selDur(m) { selectedDuration=m; renderBooking(); }
+      function selTime(t) { selectedTime=t; renderBooking(); }
+      window.selDur=selDur; window.selTime=selTime;
+      renderBooking();
 
-      renderBookingCard();
+      // ===== PAYMENT =====
+      window.openPay = async function(instant=false) {
+        const user = await authReady;
+        if (!user) { sessionStorage.setItem('ycall_redirect', location.href); location.href='auth.html'; return; }
+        if (!instant && !selectedTime) { showToast('예약 시간을 선택해주세요.','error'); return; }
 
-      // ===== BOOKING MODAL =====
-      window.openBooking = function(instant = false) {
-        if (!requireLogin('expert-detail.html?id=' + expertId)) return;
-        if (!instant && !selectedTime) {
-          showToast('예약 시간을 선택해주세요.', 'error'); return;
-        }
         const total = expert.pricePerMin * selectedDuration;
-        document.getElementById('modal-body').innerHTML = `
-          <div style="margin-bottom:20px;">
-            <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:16px;">
-              <div class="profile-avatar" style="width:56px;height:56px;font-size:1.5rem;background:var(--primary-100);color:var(--primary);border:none;">${expert.initials}</div>
-              <div>
-                <div style="font-weight:700;font-size:1rem;">${expert.name}</div>
-                <div style="font-size:0.875rem;color:var(--gray-500);">${expert.title}</div>
-              </div>
+        document.getElementById('pay-modal-body').innerHTML = `
+          <div style="background:var(--gray-50);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--primary-100);display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:700;color:var(--primary);">${expert.initials}</div>
+              <div><div style="font-weight:700;">${expert.name}</div><div style="font-size:0.875rem;color:var(--gray-500);">${expert.title}</div></div>
             </div>
-            <div style="background:var(--gray-50);border-radius:var(--radius-md);padding:16px;">
-              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">상담 유형</span><span style="font-weight:600;">${instant ? '즉시 통화' : '예약 통화'}</span></div>
-              ${!instant ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">예약 시간</span><span style="font-weight:600;">${selectedTime}</span></div>` : ''}
-              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">통화 시간</span><span style="font-weight:600;">${selectedDuration}분</span></div>
-              <div style="display:flex;justify-content:space-between;padding:10px 0 6px;font-size:1rem;font-weight:700;border-top:1px solid var(--gray-200);margin-top:6px;"><span>총 결제금액</span><span style="color:var(--primary);">${formatPrice(total)}원</span></div>
-            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">상담 유형</span><span style="font-weight:600;">${instant?'즉시 통화':'예약 통화'}</span></div>
+            ${!instant?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">예약 시간</span><span style="font-weight:600;">${selectedTime}</span></div>`:''}
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">통화 시간</span><span style="font-weight:600;">${selectedDuration}분</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:1rem;font-weight:700;border-top:1px solid var(--gray-200);margin-top:6px;"><span>총 결제금액</span><span style="color:var(--primary);">${formatPrice(total)}원</span></div>
           </div>
-          <div style="margin-bottom:16px;">
-            <div style="font-size:0.9375rem;font-weight:700;color:var(--gray-700);margin-bottom:12px;">결제 수단 선택</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);cursor:pointer;">
-                <input type="radio" name="pay" value="toss" checked style="accent-color:var(--primary);"> 💙 토스페이
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);cursor:pointer;">
-                <input type="radio" name="pay" value="card" style="accent-color:var(--primary);"> 💳 신용카드
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);cursor:pointer;">
-                <input type="radio" name="pay" value="kakao" style="accent-color:var(--primary);"> 💛 카카오페이
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);cursor:pointer;">
-                <input type="radio" name="pay" value="bank" style="accent-color:var(--primary);"> 🏦 계좌이체
-              </label>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-full btn-lg" onclick="processPayment(${total}, ${instant})">
+          <button class="btn btn-primary btn-full btn-lg" id="pay-btn" onclick="requestToss(${total},${instant})">
             ${formatPrice(total)}원 결제하기
           </button>
-          <p style="font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-top:10px;">결제 완료 후 전문가 연락처가 공개됩니다</p>
-        `;
-        document.getElementById('booking-modal').classList.remove('hidden');
+          <p style="font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-top:10px;">토스페이먼츠 안전 결제</p>`;
+
+        document.getElementById('pay-modal').classList.remove('hidden');
       };
 
-      window.closeModal = function() {
-        document.getElementById('booking-modal').classList.add('hidden');
-      };
+      window.requestToss = async function(amount, instant) {
+        const user = await authReady;
+        const btn  = document.getElementById('pay-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="margin:0 auto;width:20px;height:20px;border-width:2px;"></div>';
 
-      window.processPayment = function(total, instant) {
-        const payBtn = event.target;
-        payBtn.disabled = true;
-        payBtn.innerHTML = '<div class="spinner" style="margin:0 auto;"></div>';
+        const orderId   = `ycall_${Date.now()}_${user.uid.slice(0,6)}`;
+        const orderName = `Y-Call - ${expert.name} 상담 ${selectedDuration}분`;
+        const baseUrl   = location.href.replace(/\/[^\/]*$/, '/');
 
-        // Simulate payment processing
-        setTimeout(() => {
-          closeModal();
-          // Save booking to localStorage
-          const bookings = JSON.parse(localStorage.getItem('ycall_bookings') || '[]');
-          bookings.push({
-            id: Date.now(),
-            expertId: expert.id,
-            expertName: expert.name,
-            expertTitle: expert.title,
-            duration: selectedDuration,
-            time: instant ? '즉시' : selectedTime,
-            total,
-            status: instant ? 'ongoing' : 'upcoming',
-            date: new Date().toISOString().split('T')[0],
-            createdAt: new Date().toISOString(),
+        // Store pending booking in sessionStorage
+        sessionStorage.setItem('ycall_pending_booking', JSON.stringify({
+          expertId: expert.id,
+          expertName: expert.name,
+          expertTitle: expert.title,
+          duration: selectedDuration,
+          time: instant ? '즉시 통화' : selectedTime,
+          total: amount,
+          instant,
+        }));
+
+        try {
+          const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+          await tossPayments.requestPayment('카드', {
+            amount,
+            orderId,
+            orderName,
+            customerName: currentUserProfile?.name || user.displayName || '사용자',
+            customerEmail: user.email || '',
+            successUrl: baseUrl + 'payment-success.html',
+            failUrl:    baseUrl + 'payment-fail.html',
           });
-          localStorage.setItem('ycall_bookings', JSON.stringify(bookings));
-          showToast('예약이 완료되었습니다! 곧 연락드립니다. 📞', 'success');
-          setTimeout(() => { location.href = 'dashboard-user.html'; }, 2000);
-        }, 2000);
+        } catch (e) {
+          btn.disabled = false;
+          btn.textContent = `${formatPrice(amount)}원 결제하기`;
+          if (e.code !== 'USER_CANCEL') showToast('결제 중 오류: ' + e.message, 'error');
+        }
       };
 
-      document.getElementById('booking-modal').addEventListener('click', e => {
-        if (e.target.id === 'booking-modal') closeModal();
-      });
+      window.closePay = function() { document.getElementById('pay-modal').classList.add('hidden'); };
+      document.getElementById('pay-modal').addEventListener('click', e => { if (e.target.id==='pay-modal') closePay(); });
     }
   </script>
 </body>
