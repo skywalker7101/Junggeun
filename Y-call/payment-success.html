@@ -8,23 +8,33 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .result-card { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 60px 48px; text-align: center; max-width: 480px; width: 100%; margin: 24px; }
+    .result-card { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); padding: 52px 44px; text-align: center; max-width: 500px; width: 100%; margin: 24px; }
     .result-icon { font-size: 5rem; margin-bottom: 24px; }
     .result-title { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
-    .result-desc { font-size: 1rem; color: var(--gray-500); line-height: 1.8; margin-bottom: 32px; }
-    .result-box { background: var(--gray-50); border-radius: var(--radius-md); padding: 20px; margin-bottom: 28px; text-align: left; }
+    .result-desc { font-size: 1rem; color: var(--gray-500); line-height: 1.8; margin-bottom: 28px; }
+    .result-box { background: var(--gray-50); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; text-align: left; }
     .result-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.9375rem; border-bottom: 1px solid var(--gray-200); }
     .result-row:last-child { border-bottom: none; font-weight: 700; font-size: 1rem; }
     .result-row span:last-child { color: var(--primary); }
+    .video-call-box { background: linear-gradient(135deg, #4C1D95, #7C3AED); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; color: white; }
+    .video-call-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 8px; }
+    .video-call-desc { font-size: 0.875rem; color: rgba(255,255,255,0.8); margin-bottom: 16px; line-height: 1.6; }
+    .btn-video { display: flex; align-items: center; justify-content: center; gap: 8px; background: white; color: var(--primary); font-weight: 700; font-size: 1rem; padding: 14px 24px; border-radius: var(--radius-md); text-decoration: none; transition: all 0.15s; }
+    .btn-video:hover { background: var(--primary-50); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
   <div class="result-card">
     <div class="result-icon">🎉</div>
     <div class="result-title">결제가 완료됐습니다!</div>
-    <p class="result-desc">예약이 확정되었습니다.<br>예약 시간에 맞춰 전문가가 연락드립니다.</p>
+    <p class="result-desc">예약이 확정되었습니다.<br>아래 버튼으로 지금 바로 화상통화를 시작하거나,<br>예약 시간에 마이페이지에서 입장하실 수 있습니다.</p>
     <div class="result-box" id="result-info">
       <div style="text-align:center;color:var(--gray-400);padding:10px;">결제 정보를 불러오는 중...</div>
+    </div>
+    <div class="video-call-box" id="video-box" style="display:none;">
+      <div class="video-call-title">📹 화상통화 준비 완료!</div>
+      <div class="video-call-desc">아래 버튼을 누르면 바로 통화방에 입장합니다.<br>전문가도 같은 링크로 입장할 수 있습니다.</div>
+      <a id="video-btn" href="#" class="btn-video">📹 지금 화상통화 시작하기</a>
     </div>
     <a href="dashboard-user.html" class="btn btn-primary btn-full btn-lg">예약 내역 확인하기</a>
     <a href="experts.html" class="btn btn-outline btn-full" style="margin-top:10px;">전문가 더 보기</a>
@@ -32,7 +42,6 @@
 
   <div id="toast-container"></div>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -40,24 +49,24 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
-    const params = new URLSearchParams(location.search);
+    const params     = new URLSearchParams(location.search);
     const paymentKey = params.get('paymentKey');
     const orderId    = params.get('orderId');
     const amount     = params.get('amount');
-
-    // Parse booking info from orderId
-    const pending = JSON.parse(sessionStorage.getItem('ycall_pending_booking') || 'null');
+    const pending    = JSON.parse(sessionStorage.getItem('ycall_pending_booking') || 'null');
 
     async function confirmPayment() {
       try {
         const user = await authReady;
         if (!user) { location.href = 'auth.html'; return; }
 
-        // Save booking to Firestore
+        // Generate unique room ID
+        const roomId = 'ycall-' + (pending?.expertId || '0') + '-' + Date.now().toString(36);
+
         if (pending) {
           await saveBooking({
             userId: user.uid,
-            userName: pending.userName || user.displayName || '사용자',
+            userName: currentUserProfile?.name || user.displayName || '사용자',
             expertId: pending.expertId,
             expertName: pending.expertName,
             expertTitle: pending.expertTitle,
@@ -66,14 +75,20 @@
             total: parseInt(amount) || pending.total,
             paymentKey,
             orderId,
+            roomId,
             status: 'upcoming',
             date: new Date().toISOString().split('T')[0],
           });
           sessionStorage.removeItem('ycall_pending_booking');
+
+          // Show video call button
+          const expertNameEnc = encodeURIComponent(pending.expertName || '전문가 상담');
+          const userNameEnc   = encodeURIComponent(currentUserProfile?.name || user.displayName || '사용자');
+          const videoUrl = `video-call.html?room=${roomId}&name=${userNameEnc}&expertName=${expertNameEnc}&from=dashboard-user.html`;
+          document.getElementById('video-btn').href = videoUrl;
+          document.getElementById('video-box').style.display = 'block';
         }
 
-        // Show info
-        const expert = pending ? getExpertById(pending.expertId) : null;
         document.getElementById('result-info').innerHTML = `
           <div class="result-row"><span>전문가</span><span>${pending?.expertName || '-'}</span></div>
           <div class="result-row"><span>예약 시간</span><span>${pending?.time || '-'}</span></div>

@@ -74,6 +74,14 @@ async function getUserBookings(uid) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+async function getExpertBookings(expertId) {
+  const snap = await db.collection('bookings')
+    .where('expertId', '==', expertId)
+    .orderBy('createdAt', 'desc')
+    .get();
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
 // ===== EXPERT REGISTRATION =====
 async function saveExpertApplication(uid, data) {
   await db.collection('expertApplications').doc(uid).set({

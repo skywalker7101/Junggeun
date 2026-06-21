@@ -88,6 +88,15 @@
       .stats-cards { grid-template-columns: repeat(2, 1fr); }
       .profile-edit-grid { grid-template-columns: 1fr; }
     }
+    .booking-item { background: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200); padding: 16px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+    .booking-info { flex: 1; }
+    .booking-name { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+    .booking-meta { font-size: 0.8125rem; color: var(--gray-400); margin-top: 4px; }
+    .booking-right { text-align: right; flex-shrink: 0; }
+    .booking-price { font-size: 1rem; font-weight: 700; color: var(--primary); }
+    .booking-status-badge { font-size: 0.8125rem; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full); margin-top: 4px; display: inline-block; }
+    .status-upcoming { background: var(--amber-100); color: #B45309; }
+    .status-done { background: var(--green-100); color: var(--green); }
   </style>
 </head>
 <body data-page="">
@@ -165,6 +174,12 @@
               </select>
             </div>
             <div class="chart-bars" id="earnings-chart"></div>
+          </div>
+
+          <!-- Upcoming video calls -->
+          <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:24px;margin-bottom:20px;">
+            <div style="font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:16px;">📅 예정된 상담</div>
+            <div id="expert-upcoming-list"><div style="text-align:center;padding:30px;color:var(--gray-400);">로딩 중...</div></div>
           </div>
 
           <!-- Recent calls -->
@@ -373,13 +388,29 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!isLoggedIn()) { location.href = 'auth.html'; return; }
-      const user = currentUser;
-      document.getElementById('dash-avatar').textContent = user.name?.[0] || 'E';
-      document.getElementById('dash-name').textContent = user.name || '전문가';
+    authReady.then(async user => {
+      if (!user) { location.href = 'auth.html'; return; }
+      const profile = currentUserProfile || {};
+      const name    = profile.name || user.displayName || '전문가';
+      const photoURL = user.photoURL;
+
+      const avatarEl = document.getElementById('dash-avatar');
+      if (photoURL) avatarEl.innerHTML = `<img src="${photoURL}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      else avatarEl.textContent = name[0] || 'E';
+
+      document.getElementById('dash-name').textContent  = name;
+      document.getElementById('dash-email').textContent = user.email || '';
       renderChart();
       renderAvailSlots();
+
+      // Load upcoming bookings where this expert is the target
+      try {
+        const expertEntry = EXPERTS.find(e => e.email === user.email || e.name === name);
+        if (expertEntry) {
+          const bookings = await getExpertBookings(expertEntry.id);
+          renderExpertBookings(bookings, name);
+        }
+      } catch(e) { console.warn('Expert booking load:', e); }
     });
 
     function showSection(id) {
@@ -432,6 +463,34 @@
 
     function saveExpertProfile() {
       showToast('프로필이 저장되었습니다.', 'success');
+    }
+
+    function renderExpertBookings(bookings, expertName) {
+      const el = document.getElementById('expert-upcoming-list');
+      if (!el) return;
+      if (!bookings.length) {
+        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--gray-400);">예정된 상담이 없습니다.</div>`;
+        return;
+      }
+      el.innerHTML = bookings.filter(b => b.status === 'upcoming').map(b => {
+        const videoBtn = b.roomId
+          ? `<a href="video-call.html?room=${b.roomId}&name=${encodeURIComponent(expertName)}&expertName=${encodeURIComponent(b.expertName||expertName)}&from=dashboard-expert.html"
+               class="btn btn-primary btn-sm" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;">
+               📹 화상통화 입장
+             </a>` : '';
+        return `<div class="booking-item" style="flex-wrap:wrap;">
+          <div class="booking-avatar" style="background:var(--primary-100);color:var(--primary);display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:var(--radius-md);font-weight:700;flex-shrink:0;">${b.userName?.[0]||'U'}</div>
+          <div class="booking-info">
+            <div class="booking-name">${b.userName || '사용자'}</div>
+            <div class="booking-meta">📅 ${b.date||''} · ⏱ ${b.duration||0}분 · 🕐 ${b.time||''}</div>
+            ${videoBtn}
+          </div>
+          <div class="booking-right">
+            <div class="booking-price">${(b.total||0).toLocaleString('ko-KR')}원</div>
+            <div class="booking-status-badge status-upcoming">예약 완료</div>
+          </div>
+        </div>`;
+      }).join('') || `<div style="text-align:center;padding:40px;color:var(--gray-400);">예정된 상담이 없습니다.</div>`;
     }
   </script>
 </body>

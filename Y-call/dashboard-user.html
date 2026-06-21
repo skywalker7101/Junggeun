@@ -176,16 +176,22 @@
     });
 
     function bookingHTML(b) {
-      const expert = getExpertById(b.expertId);
+      const expert   = getExpertById(b.expertId);
       const initials = expert?.initials || (b.expertName?.[0] || '?');
       const statusMap = { upcoming:['status-upcoming','예약 완료'], done:['status-done','상담 완료'], ongoing:['status-done','완료'], cancelled:['status-upcoming','취소'] };
       const [cls, label] = statusMap[b.status] || ['status-done','완료'];
-      return `<div class="booking-item">
+      const videoBtn = b.roomId && b.status === 'upcoming'
+        ? `<a href="video-call.html?room=${b.roomId}&name=${encodeURIComponent(currentUserProfile?.name||'사용자')}&expertName=${encodeURIComponent(b.expertName||'')}&from=dashboard-user.html"
+             class="btn btn-primary btn-sm" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;">
+             📹 화상통화 입장
+           </a>` : '';
+      return `<div class="booking-item" style="flex-wrap:wrap;">
         <div class="booking-avatar">${initials}</div>
         <div class="booking-info">
           <div class="booking-name">${b.expertName || '전문가'}</div>
           <div class="booking-subtitle">${expert?.title || ''}</div>
           <div class="booking-meta">📅 ${b.date || ''} · ⏱ ${b.duration||0}분 · 🕐 ${b.time||''}</div>
+          ${videoBtn}
         </div>
         <div class="booking-right">
           <div class="booking-price">${(b.total||0).toLocaleString('ko-KR')}원</div>
