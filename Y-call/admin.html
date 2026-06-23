@@ -330,32 +330,32 @@
                 <div class="stat-card-label">총 매출 (이번달)</div>
                 <div class="stat-card-icon icon-blue">💰</div>
               </div>
-              <div class="stat-card-val">24,830,000</div>
-              <div class="stat-card-change up">▲ 18.4% 지난달 대비</div>
+              <div class="stat-card-val" id="stat-revenue">-</div>
+              <div class="stat-card-change up" id="stat-revenue-sub">로딩 중...</div>
             </div>
             <div class="stat-card">
               <div class="stat-card-top">
                 <div class="stat-card-label">총 회원 수</div>
                 <div class="stat-card-icon icon-green">👥</div>
               </div>
-              <div class="stat-card-val">52,841</div>
-              <div class="stat-card-change up">▲ 1,234명 신규 가입</div>
+              <div class="stat-card-val" id="stat-users">-</div>
+              <div class="stat-card-change up" id="stat-users-sub">로딩 중...</div>
             </div>
             <div class="stat-card">
               <div class="stat-card-top">
                 <div class="stat-card-label">총 상담 건수 (이번달)</div>
                 <div class="stat-card-icon icon-amber">📞</div>
               </div>
-              <div class="stat-card-val">8,472</div>
-              <div class="stat-card-change up">▲ 12.7% 증가</div>
+              <div class="stat-card-val" id="stat-bookings">-</div>
+              <div class="stat-card-change up" id="stat-bookings-sub">로딩 중...</div>
             </div>
             <div class="stat-card">
               <div class="stat-card-top">
                 <div class="stat-card-label">등록 전문가 수</div>
                 <div class="stat-card-icon icon-red">⭐</div>
               </div>
-              <div class="stat-card-val">1,823</div>
-              <div class="stat-card-change up">▲ 23명 신규 등록</div>
+              <div class="stat-card-val" id="stat-pending">-</div>
+              <div class="stat-card-change up" id="stat-pending-sub">로딩 중...</div>
             </div>
           </div>
 
@@ -384,12 +384,8 @@
                 <thead><tr>
                   <th>이름</th><th>가입일</th><th>상태</th>
                 </tr></thead>
-                <tbody>
-                  <tr><td>김○○</td><td>2026-06-20</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
-                  <tr><td>이○○</td><td>2026-06-20</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
-                  <tr><td>박○○</td><td>2026-06-19</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
-                  <tr><td>최○○</td><td>2026-06-19</td><td><span class="tbadge tbadge-amber">인증 대기</span></td></tr>
-                  <tr><td>정○○</td><td>2026-06-18</td><td><span class="tbadge tbadge-green">활성</span></td></tr>
+                <tbody id="recent-users-tbody">
+                  <tr><td colspan="3" style="text-align:center;color:#475569;padding:20px;">로딩 중...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -402,28 +398,8 @@
                 <thead><tr>
                   <th>이름</th><th>분야</th><th>처리</th>
                 </tr></thead>
-                <tbody>
-                  <tr>
-                    <td>강○○</td><td>법률</td>
-                    <td><div class="action-btns">
-                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'강○○')">승인</button>
-                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
-                    </div></td>
-                  </tr>
-                  <tr>
-                    <td>윤○○</td><td>세무</td>
-                    <td><div class="action-btns">
-                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'윤○○')">승인</button>
-                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
-                    </div></td>
-                  </tr>
-                  <tr>
-                    <td>오○○</td><td>IT/개발</td>
-                    <td><div class="action-btns">
-                      <button class="action-btn action-btn-approve" onclick="approveExpert(this,'오○○')">승인</button>
-                      <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">거절</button>
-                    </div></td>
-                  </tr>
+                <tbody id="overview-approve-tbody">
+                  <tr><td colspan="3" style="text-align:center;color:#475569;padding:20px;">로딩 중...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -717,18 +693,6 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
-    // ===== LOGIN =====
-    function adminLogin() {
-      const id = document.getElementById('admin-id').value;
-      const pw = document.getElementById('admin-pw').value;
-      if (id === 'admin' && pw === '1234') {
-        document.getElementById('admin-login').style.display = 'none';
-        document.getElementById('admin-app').style.display = 'flex';
-        initAdmin();
-      } else {
-        showToast('아이디 또는 비밀번호가 틀렸습니다.', 'error');
-      }
-    }
     function adminLogout() {
       document.getElementById('admin-app').style.display = 'none';
       document.getElementById('admin-login').style.display = 'flex';
@@ -824,25 +788,29 @@
     }
 
     // ===== TABLES =====
-    function renderUsersTable() {
-      const names = ['김민수','이지은','박준영','최서연','정대호','한소희','강민준','윤지혜','오세훈','임수진'];
+    function renderUsersTable(users) {
       const tbody = document.getElementById('users-tbody');
-      tbody.innerHTML = names.map((n, i) => `
-        <tr>
-          <td style="color:#475569;">#${(52841-i).toLocaleString()}</td>
-          <td style="font-weight:600;color:white;">${n}</td>
-          <td>${n[0].toLowerCase()}****@gmail.com</td>
-          <td>2026-06-${String(20-i).padStart(2,'0')}</td>
-          <td>${Math.floor(Math.random()*50+1)}건</td>
-          <td>${(Math.floor(Math.random()*500+50)*1000).toLocaleString()}원</td>
-          <td><span class="tbadge ${i===3?'tbadge-amber':i===7?'tbadge-red':'tbadge-green'}">${i===3?'인증 대기':i===7?'정지':'활성'}</span></td>
+      if (!users || !users.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#475569;padding:30px;">가입한 회원이 없습니다.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map((u, i) => {
+        const d = u.data(); const id = u.id;
+        const name  = d.name  || '이름 없음';
+        const email = d.email || '-';
+        const date  = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('ko-KR') : '-';
+        return `<tr>
+          <td style="color:#475569;font-size:0.8rem;">${id.slice(0,8)}…</td>
+          <td style="font-weight:600;color:white;">${name}</td>
+          <td>${email}</td>
+          <td>${date}</td>
+          <td>-</td><td>-</td>
+          <td><span class="tbadge tbadge-green">활성</span></td>
           <td><div class="action-btns">
-            <button class="action-btn action-btn-view" onclick="showToast('상세 정보: ${n}','success')">상세</button>
-            <button class="action-btn action-btn-warn" onclick="showToast('${n}님에게 경고를 발송했습니다.','success')">경고</button>
-            <button class="action-btn action-btn-block" onclick="showToast('${n}님을 정지했습니다.','error')">정지</button>
+            <button class="action-btn action-btn-view" onclick="showToast('${name} 님 UID: ${id}','success')">상세</button>
           </div></td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     function renderExpertsTable() {
@@ -864,56 +832,59 @@
       `).join('');
     }
 
-    function renderCallsTable() {
-      const users = ['김○○','이○○','박○○','최○○','정○○','한○○'];
+    function renderCallsTable(bookings) {
       const tbody = document.getElementById('calls-tbody');
-      tbody.innerHTML = Array.from({length:10}, (_, i) => {
-        const expert = EXPERTS[i % EXPERTS.length];
-        const mins = [10,15,20,30][i%4];
-        const amt = expert.pricePerMin * mins;
-        const statuses = [['tbadge-green','완료'],['tbadge-blue','진행 중'],['tbadge-gray','취소']];
-        const [cls, label] = statuses[i % statuses.length === 1 && i>4 ? 0 : i % statuses.length];
+      if (!bookings || !bookings.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#475569;padding:30px;">예약 내역이 없습니다.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = bookings.map((b, i) => {
+        const d = b.data();
+        const statusMap = { upcoming:['tbadge-amber','예약'], done:['tbadge-green','완료'], cancelled:['tbadge-gray','취소'] };
+        const [cls, label] = statusMap[d.status] || ['tbadge-green','완료'];
         return `<tr>
-          <td style="color:#475569;">#${8472-i}</td>
-          <td>${users[i%users.length]}</td>
-          <td style="color:white;font-weight:600;">${expert.name}</td>
-          <td><span class="tbadge tbadge-blue">${expert.categoryName}</span></td>
-          <td>${mins}분</td>
-          <td style="color:#10B981;font-weight:700;">${amt.toLocaleString()}원</td>
-          <td style="color:#64748B;">2026-06-${String(20-Math.floor(i/3)).padStart(2,'0')}</td>
+          <td style="color:#475569;font-size:0.8rem;">${b.id.slice(0,8)}…</td>
+          <td>${d.userName || '-'}</td>
+          <td style="color:white;font-weight:600;">${d.expertName || '-'}</td>
+          <td><span class="tbadge tbadge-blue">-</span></td>
+          <td>${d.duration || '-'}분</td>
+          <td style="color:#10B981;font-weight:700;">${(d.total||0).toLocaleString()}원</td>
+          <td style="color:#64748B;">${d.date || '-'}</td>
           <td><span class="tbadge ${cls}">${label}</span></td>
         </tr>`;
       }).join('');
     }
 
-    function renderApproveList() {
-      const applicants = [
-        { name:'강민준', cat:'법률', title:'변호사 10년', date:'2026-06-19', doc:'신분증+자격증' },
-        { name:'윤지혜', cat:'금융/세무', title:'공인세무사', date:'2026-06-18', doc:'신분증+자격증' },
-        { name:'오세훈', cat:'IT/개발', title:'풀스택 개발자', date:'2026-06-17', doc:'신분증만' },
-      ];
+    function renderApproveList(docs) {
       const el = document.getElementById('approve-list');
-      el.innerHTML = applicants.map(a => `
-        <div class="table-card" style="margin-bottom:14px;">
+      if (!docs || !docs.length) {
+        el.innerHTML = '<div style="text-align:center;padding:40px;color:#475569;">대기 중인 전문가 신청이 없습니다.</div>';
+        return;
+      }
+      el.innerHTML = docs.map(doc => {
+        const a = doc.data(); const uid = doc.id;
+        const date = a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('ko-KR') : '-';
+        return `
+        <div class="table-card" style="margin-bottom:14px;" id="app-${uid}">
           <div style="padding:20px 24px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
               <div style="display:flex;align-items:center;gap:14px;">
-                <div style="width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:700;color:#A78BFA;">${a.name[0]}</div>
+                <div style="width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:700;color:#A78BFA;">${(a.name||'?')[0]}</div>
                 <div>
-                  <div style="font-size:1rem;font-weight:700;color:white;margin-bottom:3px;">${a.name} <span class="tbadge tbadge-amber" style="font-size:0.75rem;">대기 중</span></div>
-                  <div style="font-size:0.875rem;color:#64748B;">${a.title} · ${a.cat}</div>
-                  <div style="font-size:0.8125rem;color:#475569;margin-top:2px;">📎 제출 서류: ${a.doc} · 신청일: ${a.date}</div>
+                  <div style="font-size:1rem;font-weight:700;color:white;margin-bottom:3px;">${a.name||'-'} <span class="tbadge tbadge-amber" style="font-size:0.75rem;">대기 중</span></div>
+                  <div style="font-size:0.875rem;color:#64748B;">${a.title||'-'} · ${a.category||'-'}</div>
+                  <div style="font-size:0.8125rem;color:#475569;margin-top:2px;">📧 ${a.email||'-'} · 신청일: ${date}</div>
+                  <div style="font-size:0.8125rem;color:#475569;margin-top:2px;">📋 ${a.bio||''}</div>
                 </div>
               </div>
               <div class="action-btns">
-                <button class="action-btn action-btn-view" onclick="showToast('서류 확인: ${a.name}','success')">서류 확인</button>
-                <button class="action-btn action-btn-approve" onclick="approveExpert(this,'${a.name}')">✅ 승인</button>
-                <button class="action-btn action-btn-reject" onclick="rejectExpert(this)">❌ 거절</button>
+                <button class="action-btn action-btn-approve" onclick="approveExpert('${uid}','${a.name||'전문가'}')">✅ 승인</button>
+                <button class="action-btn action-btn-reject" onclick="rejectExpert('${uid}')">❌ 거절</button>
               </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     function renderSettleList() {
@@ -966,41 +937,121 @@
     }
 
     // ===== ACTIONS =====
-    function approveExpert(btn, name) {
-      btn.closest('tr, .table-card')?.style && (btn.closest('.table-card').style.opacity = '0.5');
-      btn.closest('tr') && btn.closest('tr').remove();
-      showToast(`${name}님이 승인되었습니다. ✅`, 'success');
+    async function approveExpert(uid, name) {
+      if (!confirm(`${name}님을 전문가로 승인하시겠습니까?`)) return;
+      try {
+        await db.collection('expertApplications').doc(uid).update({ status: 'approved' });
+        await db.collection('users').doc(uid).update({ role: 'expert' });
+        document.getElementById('app-' + uid)?.remove();
+        // overview 테이블에서도 제거
+        document.querySelector(`[data-app-uid="${uid}"]`)?.closest('tr')?.remove();
+        showToast(`${name}님이 전문가로 승인되었습니다. ✅`, 'success');
+        // 통계 업데이트
+        const pendingEl = document.getElementById('stat-pending');
+        if (pendingEl) pendingEl.textContent = Math.max(0, parseInt(pendingEl.textContent||'0') - 1);
+      } catch(e) { showToast('승인 중 오류: ' + e.message, 'error'); }
     }
-    function rejectExpert(btn) {
-      btn.closest('tr')?.remove();
-      btn.closest('.table-card')?.style && (btn.closest('.table-card').style.opacity = '0.4');
-      showToast('신청이 거절되었습니다.', 'error');
+
+    async function rejectExpert(uid) {
+      if (!confirm('이 신청을 거절하시겠습니까?')) return;
+      try {
+        await db.collection('expertApplications').doc(uid).update({ status: 'rejected' });
+        await db.collection('users').doc(uid).update({ role: 'user' });
+        document.getElementById('app-' + uid)?.remove();
+        document.querySelector(`[data-app-uid="${uid}"]`)?.closest('tr')?.remove();
+        showToast('신청이 거절되었습니다.', 'error');
+      } catch(e) { showToast('거절 중 오류: ' + e.message, 'error'); }
     }
+
     function bulkSettle() {
       document.querySelectorAll('.settle-item').forEach(el => { el.style.opacity = '0.4'; });
       showToast('전체 정산이 완료되었습니다. 💰', 'success');
     }
 
     // ===== INIT =====
-    function initAdmin() {
+    async function initAdmin() {
       document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
       renderMainChart();
       renderDailyChart();
       renderHourlyChart();
       renderCategoryStats();
-      renderUsersTable();
       renderExpertsTable();
-      renderCallsTable();
-      renderApproveList();
       renderSettleList();
       renderReports();
+
+      try {
+        // Load Firestore data in parallel
+        const [usersSnap, bookingsSnap, appsSnap] = await Promise.all([
+          db.collection('users').orderBy('createdAt','desc').limit(50).get(),
+          db.collection('bookings').orderBy('createdAt','desc').limit(100).get(),
+          db.collection('expertApplications').where('status','==','pending').get(),
+        ]);
+
+        // ── Stats ──
+        const totalRevenue = bookingsSnap.docs.reduce((s, d) => s + (d.data().total || 0), 0);
+        document.getElementById('stat-revenue').textContent = totalRevenue.toLocaleString('ko-KR');
+        document.getElementById('stat-revenue-sub').textContent = '원 (누적 결제)';
+        document.getElementById('stat-users').textContent = usersSnap.size.toLocaleString();
+        document.getElementById('stat-users-sub').textContent = '명 가입';
+        document.getElementById('stat-bookings').textContent = bookingsSnap.size.toLocaleString();
+        document.getElementById('stat-bookings-sub').textContent = '건 예약';
+        document.getElementById('stat-pending').textContent = appsSnap.size;
+        document.getElementById('stat-pending-sub').textContent = '건 승인 대기';
+
+        // ── Recent users (overview) ──
+        const recentTbody = document.getElementById('recent-users-tbody');
+        recentTbody.innerHTML = usersSnap.docs.slice(0,5).map(doc => {
+          const d = doc.data();
+          const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('ko-KR') : '-';
+          return `<tr><td>${d.name||'-'}</td><td>${date}</td><td><span class="tbadge tbadge-green">활성</span></td></tr>`;
+        }).join('') || '<tr><td colspan="3" style="text-align:center;color:#475569;">회원 없음</td></tr>';
+
+        // ── Pending experts (overview) ──
+        const approveOverview = document.getElementById('overview-approve-tbody');
+        approveOverview.innerHTML = appsSnap.docs.slice(0,3).map(doc => {
+          const d = doc.data(); const uid = doc.id;
+          return `<tr>
+            <td data-app-uid="${uid}">${d.name||'-'}</td>
+            <td>${d.category||'-'}</td>
+            <td><div class="action-btns">
+              <button class="action-btn action-btn-approve" onclick="approveExpert('${uid}','${d.name||''}')">승인</button>
+              <button class="action-btn action-btn-reject" onclick="rejectExpert('${uid}')">거절</button>
+            </div></td>
+          </tr>`;
+        }).join('') || '<tr><td colspan="3" style="text-align:center;color:#475569;">대기 없음</td></tr>';
+
+        // ── Full tables ──
+        renderUsersTable(usersSnap.docs);
+        renderCallsTable(bookingsSnap.docs);
+        renderApproveList(appsSnap.docs);
+
+      } catch(e) {
+        console.error('Admin data load error:', e);
+        showToast('데이터 로드 실패. Firestore 규칙을 확인하세요.', 'error');
+      }
+    }
+
+    // ===== LOGIN =====
+    async function adminLogin() {
+      const id = document.getElementById('admin-id').value;
+      const pw = document.getElementById('admin-pw').value;
+      if (id === 'admin' && pw === '1234') {
+        // Firebase 익명 로그인으로 Firestore 읽기 권한 획득
+        try { await firebase.auth().signInAnonymously(); } catch(e) { console.warn('Anon auth:', e); }
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'flex';
+        sessionStorage.setItem('admin_logged', '1');
+        initAdmin();
+      } else {
+        showToast('아이디 또는 비밀번호가 틀렸습니다.', 'error');
+      }
     }
 
     // Auto-login check
     if (sessionStorage.getItem('admin_logged')) {
       document.getElementById('admin-login').style.display = 'none';
       document.getElementById('admin-app').style.display = 'flex';
-      initAdmin();
+      firebase.auth().signInAnonymously().catch(()=>{}).then(()=>initAdmin());
     }
   </script>
 </body>
