@@ -109,12 +109,12 @@ function renderFooter() {
           <a href="#" class="footer-link">자주 묻는 질문</a>
           <a href="#" class="footer-link">1:1 문의</a>
           <a href="#" class="footer-link">공지사항</a>
-          <a href="#" class="footer-link">이용약관</a>
+          <a href="terms.html" class="footer-link">이용약관</a>
         </div></div>
         <div class="footer-section"><h5>회사</h5><div class="footer-links">
           <a href="#" class="footer-link">회사 소개</a>
           <a href="#" class="footer-link">채용</a>
-          <a href="#" class="footer-link">개인정보처리방침</a>
+          <a href="privacy.html" class="footer-link">개인정보처리방침</a>
           <a href="#" class="footer-link">블로그</a>
         </div></div>
       </div>

@@ -139,8 +139,14 @@
               <span class="input-eye" onclick="togglePw('signup-pw',this)">👁</span>
             </div>
           </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;background:var(--gray-50);border-radius:var(--radius-md);padding:14px;">
+            <input type="checkbox" id="agree-terms" style="width:18px;height:18px;margin-top:2px;accent-color:var(--primary);flex-shrink:0;">
+            <label for="agree-terms" style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;cursor:pointer;">
+              <a href="terms.html" target="_blank" style="color:var(--primary);font-weight:600;">이용약관</a> 및
+              <a href="privacy.html" target="_blank" style="color:var(--primary);font-weight:600;">개인정보처리방침</a>에 동의합니다. <span style="color:var(--error);">(필수)</span>
+            </label>
+          </div>
           <button class="btn btn-primary btn-full btn-lg" id="signup-btn" onclick="doSignup()">무료로 회원가입</button>
-          <p class="terms-text">회원가입 시 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의합니다.</p>
           <p style="text-align:center;font-size:0.9375rem;color:var(--gray-500);">
             이미 계정이 있으신가요? <a href="#" style="color:var(--primary);font-weight:600;" onclick="switchTab('login');return false;">로그인</a>
           </p>
@@ -224,6 +230,7 @@
       const pw    = document.getElementById('signup-pw').value;
       if (!name || !email || !phone || !pw) { showErr('signup-err', '모든 항목을 입력해주세요.'); return; }
       if (pw.length < 8) { showErr('signup-err', '비밀번호는 8자 이상이어야 합니다.'); return; }
+      if (!document.getElementById('agree-terms').checked) { showErr('signup-err', '이용약관 및 개인정보처리방침에 동의해주세요.'); return; }
       setLoading('signup-btn', true);
       try {
         await fbSignUp(email, pw, name, phone);
