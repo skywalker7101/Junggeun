@@ -14,7 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user) {
       try {
         const doc = await firebase.firestore().collection('users').doc(user.uid).get();
-        currentUserProfile = doc.exists ? { uid: user.uid, ...doc.data() } : { uid: user.uid, name: user.displayName, email: user.email };
+        if (doc.exists) {
+          currentUserProfile = { uid: user.uid, ...doc.data() };
+        } else {
+          // 문서 없으면 자동 생성 (Google 로그인 등)
+          const profile = { name: user.displayName || '', email: user.email || '', phone: '', role: 'user', freeMinutes: 10, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+          await firebase.firestore().collection('users').doc(user.uid).set(profile);
+          currentUserProfile = { uid: user.uid, ...profile };
+        }
       } catch { currentUserProfile = { uid: user.uid, name: user.displayName, email: user.email }; }
     } else {
       currentUserProfile = null;

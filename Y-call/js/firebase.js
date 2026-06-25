@@ -89,5 +89,5 @@ async function saveExpertApplication(uid, data) {
     status: 'pending',
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-  await db.collection('users').doc(uid).update({ role: 'expert_pending' });
+  await db.collection('users').doc(uid).set({ role: 'expert_pending' }, { merge: true });
 }
