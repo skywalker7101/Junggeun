@@ -296,7 +296,7 @@
         </div>
         <div class="step-nav">
           <button class="btn btn-outline btn-lg" onclick="goStep(3)">← 이전</button>
-          <button class="btn btn-primary btn-lg" onclick="submitRegistration()">🚀 전문가 등록 신청</button>
+          <button class="btn btn-primary btn-lg" onclick="submitRegistration(this)">🚀 전문가 등록 신청</button>
         </div>
       </div>
 
@@ -420,12 +420,18 @@
       document.getElementById('benefits-row').style.display = currentStep === 1 ? 'grid' : 'none';
     }
 
-    async function submitRegistration() {
-      const user = await authReady;
-      if (!user) { sessionStorage.setItem('ycall_redirect','register-expert.html'); location.href='auth.html'; return; }
-      const btn = event.target;
+    async function submitRegistration(btnEl) {
+      const btn = btnEl || document.querySelector('#step-4 .btn-primary');
       btn.disabled = true;
       btn.textContent = '신청 중...';
+      const user = await authReady;
+      if (!user) {
+        btn.disabled = false;
+        btn.textContent = '🚀 전문가 등록 신청';
+        sessionStorage.setItem('ycall_redirect','register-expert.html');
+        location.href='auth.html';
+        return;
+      }
       try {
         const data = {
           uid: user.uid,
