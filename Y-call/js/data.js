@@ -7,6 +7,7 @@ const CATEGORIES = [
   { id: 'psych',    name: '심리상담', emoji: '🧠',  count: 203 },
   { id: 'business', name: '경영/창업', emoji: '📊', count: 175 },
   { id: 'edu',      name: '육아/교육', emoji: '📚', count: 267 },
+  { id: 'other',    name: '기타',     emoji: '💡',  count: 98  },
 ];
 
 const EXPERTS = [
