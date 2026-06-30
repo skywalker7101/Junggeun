@@ -82,6 +82,35 @@ async function getExpertBookings(expertId) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+// ===== APPROVED EXPERTS =====
+async function getApprovedExperts() {
+  const snap = await db.collection('expertApplications')
+    .where('status', '==', 'approved').get();
+  return snap.docs.map(doc => {
+    const d = doc.data();
+    return {
+      id:             'fs_' + doc.id,
+      uid:            doc.id,
+      name:           d.name || '전문가',
+      initials:       (d.name || '전')[0],
+      title:          d.title || '',
+      category:       d.category || 'other',
+      tags:           Array.isArray(d.keywords) ? d.keywords : [],
+      rating:         5.0,
+      reviewCount:    0,
+      callCount:      0,
+      pricePerMin:    d.pricePerMin || 1000,
+      isOnline:       true,
+      isCertified:    true,
+      bio:            d.bio || '',
+      career:         typeof d.career === 'string' ? d.career.split('\n').filter(Boolean) : [],
+      education:      [],
+      responseTime:   '평균 5분',
+      availableSlots: ['09:00', '10:00', '14:00', '15:00', '16:00'],
+    };
+  });
+}
+
 // ===== EXPERT REGISTRATION =====
 async function saveExpertApplication(uid, data) {
   await db.collection('expertApplications').doc(uid).set({

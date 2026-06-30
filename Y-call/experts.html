@@ -309,7 +309,7 @@
       }
 
       el.innerHTML = page.map(e => `
-        <div class="expert-list-card" onclick="location.href='expert-detail.html?id=${e.id}'" style="margin-bottom:16px;">
+        <div class="expert-list-card" onclick="location.href='expert-detail.html?${e.uid ? 'uid='+e.uid : 'id='+e.id}'" style="margin-bottom:16px;">
           <div class="expert-list-avatar">${e.initials}</div>
           <div class="expert-list-body">
             <div class="expert-list-top">
@@ -369,6 +369,19 @@
       if (r) r.checked = true;
       setTimeout(applyFilters, 50);
     }
+
+    // Firestore에서 승인된 전문가 불러와 목록에 추가
+    authReady.then(() => {
+      getApprovedExperts().then(fsExperts => {
+        if (!fsExperts.length) return;
+        fsExperts.forEach(e => {
+          const cat = CATEGORIES.find(c => c.id === e.category);
+          e.categoryName = cat?.name || '기타';
+        });
+        EXPERTS.push(...fsExperts);
+        applyFilters();
+      }).catch(err => console.warn('Firestore experts load:', err));
+    });
   </script>
 </body>
 </html>
