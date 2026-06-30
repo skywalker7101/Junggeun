@@ -375,7 +375,7 @@
     }
 
     async function submitRegistration(btnEl) {
-      const btn = btnEl || document.querySelector('#step-4 .btn-primary');
+      const btn = btnEl || document.querySelector('#step-3 .btn-primary');
       btn.disabled = true;
       btn.textContent = '신청 중...';
       const user = await authReady;
