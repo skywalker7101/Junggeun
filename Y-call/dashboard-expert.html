@@ -523,26 +523,21 @@
     }
 
     async function saveSlots() {
-      const uid = _slotsUid || firebase.auth().currentUser?.uid;
-      if (!uid) { showToast('로그인 후 다시 시도해주세요.', 'error'); return; }
+      const user = firebase.auth().currentUser;
+      if (!user) { showToast('로그인 후 다시 시도해주세요.', 'error'); return; }
       const btn = document.getElementById('save-slots-btn');
-      btn.disabled = true; btn.textContent = '저장 중...';
+      btn.disabled = true;
+      btn.textContent = '저장 중...';
+      const sorted = ALL_SLOTS.filter(function(s) { return _activeSlots.has(s); });
       try {
-        const sorted = ALL_SLOTS.filter(s => _activeSlots.has(s));
-        // expertApplications와 users 양쪽에 저장 (권한 이슈 대비)
-        const writes = [
-          db.collection('users').doc(uid).set({ availableSlots: sorted }, { merge: true })
-        ];
-        try {
-          writes.push(db.collection('expertApplications').doc(uid).set({ availableSlots: sorted }, { merge: true }));
-        } catch(_) {}
-        await Promise.all(writes);
+        await db.collection('users').doc(user.uid).set({ availableSlots: sorted }, { merge: true });
         showToast('가능한 시간이 저장되었습니다.', 'success');
       } catch(e) {
         showToast('저장 실패: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false; btn.textContent = '저장하기';
       }
+      btn.disabled = false;
+      btn.textContent = '저장하기';
+      db.collection('expertApplications').doc(user.uid).set({ availableSlots: sorted }, { merge: true }).catch(function(){});
     }
 
     function addTag(e) {
