@@ -228,8 +228,7 @@
               <div class="booking-summary-row"><span>통화 시간</span><span>${selectedDuration}분</span></div>
               <div class="booking-summary-row total"><span>총 결제금액</span><span style="color:var(--primary);">${formatPrice(total)}원</span></div>
             </div>
-            <button class="btn btn-primary btn-full btn-lg" onclick="openPay(false)" style="margin-bottom:8px;">💳 예약하고 결제하기</button>
-            ${expert.isOnline?`<button class="btn btn-green btn-full btn-lg" onclick="openPay(true)">📞 바로 통화하기</button>`:''}
+            <button class="btn btn-primary btn-full btn-lg" onclick="openPay()">💳 예약하고 결제하기</button>
             <p style="font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-top:12px;line-height:1.6;">✅ 안전결제 · 취소 시 전액 환불<br>📞 결제 완료 후 전화번호 안내</p>
           </div>`;
       }
@@ -240,10 +239,10 @@
       renderBooking();
 
       // ===== PAYMENT =====
-      window.openPay = async function(instant=false) {
+      window.openPay = async function() {
         const user = await authReady;
         if (!user) { sessionStorage.setItem('ycall_redirect', location.href); location.href='auth.html'; return; }
-        if (!instant && !selectedTime) { showToast('예약 시간을 선택해주세요.','error'); return; }
+        if (!selectedTime) { showToast('예약 시간을 선택해주세요.','error'); return; }
 
         const total = expert.pricePerMin * selectedDuration;
         document.getElementById('pay-modal-body').innerHTML = `
@@ -252,12 +251,12 @@
               <div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--primary-100);display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:700;color:var(--primary);">${expert.initials}</div>
               <div><div style="font-weight:700;">${expert.name}</div><div style="font-size:0.875rem;color:var(--gray-500);">${expert.title}</div></div>
             </div>
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">상담 유형</span><span style="font-weight:600;">${instant?'즉시 통화':'예약 통화'}</span></div>
-            ${!instant?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">예약 시간</span><span style="font-weight:600;">${selectedTime}</span></div>`:''}
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">상담 유형</span><span style="font-weight:600;">예약 통화</span></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">예약 시간</span><span style="font-weight:600;">${selectedTime}</span></div>
             <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9375rem;"><span style="color:var(--gray-600);">통화 시간</span><span style="font-weight:600;">${selectedDuration}분</span></div>
             <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:1rem;font-weight:700;border-top:1px solid var(--gray-200);margin-top:6px;"><span>총 결제금액</span><span style="color:var(--primary);">${formatPrice(total)}원</span></div>
           </div>
-          <button class="btn btn-primary btn-full btn-lg" id="pay-btn" onclick="requestToss(${total},${instant})">
+          <button class="btn btn-primary btn-full btn-lg" id="pay-btn" onclick="requestToss(${total})">
             ${formatPrice(total)}원 결제하기
           </button>
           <p style="font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-top:10px;">토스페이먼츠 안전 결제</p>`;
@@ -265,7 +264,7 @@
         document.getElementById('pay-modal').classList.remove('hidden');
       };
 
-      window.requestToss = async function(amount, instant) {
+      window.requestToss = async function(amount) {
         const user = await authReady;
         const btn  = document.getElementById('pay-btn');
         btn.disabled = true;
@@ -281,9 +280,8 @@
           expertName: expert.name,
           expertTitle: expert.title,
           duration: selectedDuration,
-          time: instant ? '즉시 통화' : selectedTime,
+          time: selectedTime,
           total: amount,
-          instant,
         }));
 
         try {
