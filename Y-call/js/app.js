@@ -62,6 +62,11 @@ function updateNavAuth() {
     if (userName) userName.textContent = (currentUserProfile?.name || currentUser.displayName || '사용자');
     const adminBtn = document.getElementById('nav-admin-btn');
     if (adminBtn) adminBtn.style.display = currentUser.email === 'haha00800@gmail.com' ? 'inline-flex' : 'none';
+    const dashBtn = document.getElementById('nav-dash-btn');
+    if (dashBtn) {
+      const role = currentUserProfile?.role;
+      dashBtn.href = (role === 'expert' || role === 'expert_pending') ? 'dashboard-expert.html' : 'dashboard-user.html';
+    }
   } else {
     loginBtn.classList.remove('hidden');
     signupBtn.classList.remove('hidden');
@@ -88,7 +93,7 @@ function renderNavbar(activePage) {
           <a href="auth.html?tab=signup" class="btn btn-primary btn-sm" id="nav-signup-btn">회원가입</a>
           <div class="hidden" id="nav-user-menu" style="display:flex;align-items:center;gap:12px;">
             <a href="admin.html" class="btn btn-sm" id="nav-admin-btn" style="display:none;background:#1E293B;color:#A78BFA;border:1px solid #334155;">⚙️ 관리자</a>
-            <a href="dashboard-user.html" class="btn btn-ghost btn-sm">
+            <a href="dashboard-user.html" class="btn btn-ghost btn-sm" id="nav-dash-btn">
               <span id="nav-user-name"></span>님
             </a>
             <button class="btn btn-outline btn-sm" onclick="logout()">로그아웃</button>
