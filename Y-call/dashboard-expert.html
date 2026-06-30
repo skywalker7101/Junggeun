@@ -97,6 +97,9 @@
     .booking-status-badge { font-size: 0.8125rem; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full); margin-top: 4px; display: inline-block; }
     .status-upcoming { background: var(--amber-100); color: #B45309; }
     .status-done { background: var(--green-100); color: var(--green); }
+    .slot-pill { padding: 8px 4px; text-align: center; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-300); cursor: pointer; font-size: 0.8125rem; font-weight: 500; transition: var(--transition); background: white; }
+    .slot-pill:hover { border-color: var(--primary); color: var(--primary); }
+    .slot-pill.selected { border-color: var(--primary); background: var(--primary); color: white; font-weight: 600; }
   </style>
 </head>
 <body data-page="">
@@ -456,24 +459,28 @@
       return s;
     })();
 
+    function drawSlots() {
+      const el = document.getElementById('avail-slots');
+      if (!el) return;
+      el.innerHTML = ALL_SLOTS.map(s =>
+        `<div onclick="toggleSlot(this,'${s}')" class="slot-pill ${_activeSlots.has(s)?'selected':''}">${s}</div>`
+      ).join('');
+    }
+
     async function renderAvailSlots(uid) {
       _slotsUid = uid;
+      drawSlots(); // 먼저 빈 상태로 즉시 렌더링
       try {
         const doc = await db.collection('expertApplications').doc(uid).get();
         const saved = (doc.exists && Array.isArray(doc.data().availableSlots)) ? doc.data().availableSlots : [];
         _activeSlots = new Set(saved);
+        drawSlots(); // Firestore 로드 후 선택 상태 업데이트
       } catch(e) { console.warn('슬롯 로드 실패:', e); }
-
-      const el = document.getElementById('avail-slots');
-      el.innerHTML = ALL_SLOTS.map(s => `
-        <div onclick="toggleSlot(this,'${s}')" class="duration-pill ${_activeSlots.has(s)?'selected':''}" style="text-align:center;font-size:0.8125rem;">${s}</div>
-      `).join('');
     }
 
     function toggleSlot(el, slot) {
-      el.classList.toggle('selected');
-      if (_activeSlots.has(slot)) _activeSlots.delete(slot);
-      else _activeSlots.add(slot);
+      if (_activeSlots.has(slot)) { _activeSlots.delete(slot); el.classList.remove('selected'); }
+      else { _activeSlots.add(slot); el.classList.add('selected'); }
     }
 
     async function saveSlots() {
