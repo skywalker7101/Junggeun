@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>화상통화 - Y-Call</title>
+  <title>?붿긽?듯솕 - Y-Call</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,21 +32,21 @@
 </head>
 <body>
   <div class="vc-header">
-    <div class="vc-logo">📹 <span>Y</span>-Call</div>
+    <div class="vc-logo">?벞 <span>Y</span>-Call</div>
     <div class="vc-room-info">
-      <div class="vc-room-label">화상통화 진행 중</div>
-      <div id="room-name-display">연결 중...</div>
+      <div class="vc-room-label">?붿긽?듯솕 吏꾪뻾 以?/div>
+      <div id="room-name-display">?곌껐 以?..</div>
     </div>
     <div class="vc-actions">
-      <button class="vc-btn vc-btn-outline" onclick="copyRoomLink()">🔗 링크 복사</button>
-      <button class="vc-btn vc-btn-danger" onclick="endCall()">📵 통화 종료</button>
+      <button class="vc-btn vc-btn-outline" onclick="copyRoomLink()">?뵕 留곹겕 蹂듭궗</button>
+      <button class="vc-btn vc-btn-danger" onclick="endCall()">?벘 ?듯솕 醫낅즺</button>
     </div>
   </div>
 
   <div id="jitsi-container">
     <div class="loading-screen" id="loading-screen">
       <div class="loading-spinner"></div>
-      <div class="loading-text">화상통화 연결 중...</div>
+      <div class="loading-text">?붿긽?듯솕 ?곌껐 以?..</div>
     </div>
   </div>
 
@@ -54,19 +54,19 @@
   <script>
     const params     = new URLSearchParams(location.search);
     const roomId     = params.get('room');
-    const userName   = decodeURIComponent(params.get('name') || '사용자');
+    const userName   = decodeURIComponent(params.get('name') || '?ъ슜??);
     const returnPage = params.get('from') || 'dashboard-user.html';
 
     if (!roomId) {
       document.getElementById('jitsi-container').innerHTML = `
         <div class="error-screen">
-          <div class="error-emoji">😕</div>
-          <div class="error-title">잘못된 접근입니다</div>
-          <div class="error-desc">화상통화 링크가 유효하지 않습니다.</div>
-          <button class="vc-btn vc-btn-outline" style="margin-top:8px;" onclick="location.href='index.html'">홈으로</button>
+          <div class="error-emoji">?삎</div>
+          <div class="error-title">?섎せ???묎렐?낅땲??/div>
+          <div class="error-desc">?붿긽?듯솕 留곹겕媛 ?좏슚?섏? ?딆뒿?덈떎.</div>
+          <button class="vc-btn vc-btn-outline" style="margin-top:8px;" onclick="location.href='index.html'">?덉쑝濡?/button>
         </div>`;
     } else {
-      document.getElementById('room-name-display').textContent = decodeURIComponent(params.get('expertName') || '전문가 상담');
+      document.getElementById('room-name-display').textContent = decodeURIComponent(params.get('expertName') || '?꾨Ц媛 ?곷떞');
 
       window.addEventListener('load', () => {
         if (typeof JitsiMeetExternalAPI === 'undefined') { showError(); return; }
@@ -101,21 +101,21 @@
     function showError() {
       document.getElementById('jitsi-container').innerHTML = `
         <div class="error-screen">
-          <div class="error-emoji">⚠️</div>
-          <div class="error-title">화상통화 연결 실패</div>
-          <div class="error-desc">네트워크 문제 또는 방화벽으로 인해 연결하지 못했습니다.<br>잠시 후 다시 시도해주세요.</div>
-          <button class="vc-btn vc-btn-outline" style="margin-top:16px;" onclick="location.reload()">다시 시도</button>
+          <div class="error-emoji">?좑툘</div>
+          <div class="error-title">?붿긽?듯솕 ?곌껐 ?ㅽ뙣</div>
+          <div class="error-desc">?ㅽ듃?뚰겕 臾몄젣 ?먮뒗 諛⑺솕踰쎌쑝濡??명빐 ?곌껐?섏? 紐삵뻽?듬땲??<br>?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂.</div>
+          <button class="vc-btn vc-btn-outline" style="margin-top:16px;" onclick="location.reload()">?ㅼ떆 ?쒕룄</button>
         </div>`;
     }
 
     function endCall() {
-      if (confirm('통화를 종료하시겠습니까?')) location.href = returnPage;
+      if (confirm('?듯솕瑜?醫낅즺?섏떆寃좎뒿?덇퉴?')) location.href = returnPage;
     }
 
     function copyRoomLink() {
       const link = location.href;
       navigator.clipboard.writeText(link).then(() => {
-        alert('링크가 복사되었습니다!\n상대방에게 공유하면 같이 참여할 수 있습니다.');
+        alert('留곹겕媛 蹂듭궗?섏뿀?듬땲??\n?곷?諛⑹뿉寃?怨듭쑀?섎㈃ 媛숈씠 李몄뿬?????덉뒿?덈떎.');
       });
     }
   </script>
