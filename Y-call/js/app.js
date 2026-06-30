@@ -60,6 +60,8 @@ function updateNavAuth() {
     signupBtn.classList.add('hidden');
     userMenu.classList.remove('hidden');
     if (userName) userName.textContent = (currentUserProfile?.name || currentUser.displayName || '사용자');
+    const adminBtn = document.getElementById('nav-admin-btn');
+    if (adminBtn) adminBtn.style.display = currentUser.email === 'haha00800@gmail.com' ? 'inline-flex' : 'none';
   } else {
     loginBtn.classList.remove('hidden');
     signupBtn.classList.remove('hidden');
@@ -85,6 +87,7 @@ function renderNavbar(activePage) {
           <a href="auth.html" class="btn btn-ghost btn-sm" id="nav-login-btn">로그인</a>
           <a href="auth.html?tab=signup" class="btn btn-primary btn-sm" id="nav-signup-btn">회원가입</a>
           <div class="hidden" id="nav-user-menu" style="display:flex;align-items:center;gap:12px;">
+            <a href="admin.html" class="btn btn-sm" id="nav-admin-btn" style="display:none;background:#1E293B;color:#A78BFA;border:1px solid #334155;">⚙️ 관리자</a>
             <a href="dashboard-user.html" class="btn btn-ghost btn-sm">
               <span id="nav-user-name"></span>님
             </a>
