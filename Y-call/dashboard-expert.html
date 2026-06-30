@@ -523,12 +523,20 @@
     }
 
     async function saveSlots() {
-      if (!_slotsUid) return;
+      const uid = _slotsUid || firebase.auth().currentUser?.uid;
+      if (!uid) { showToast('로그인 후 다시 시도해주세요.', 'error'); return; }
       const btn = document.getElementById('save-slots-btn');
       btn.disabled = true; btn.textContent = '저장 중...';
       try {
         const sorted = ALL_SLOTS.filter(s => _activeSlots.has(s));
-        await saveExpertSlots(_slotsUid, sorted);
+        // expertApplications와 users 양쪽에 저장 (권한 이슈 대비)
+        const writes = [
+          db.collection('users').doc(uid).set({ availableSlots: sorted }, { merge: true })
+        ];
+        try {
+          writes.push(db.collection('expertApplications').doc(uid).set({ availableSlots: sorted }, { merge: true }));
+        } catch(_) {}
+        await Promise.all(writes);
         showToast('가능한 시간이 저장되었습니다.', 'success');
       } catch(e) {
         showToast('저장 실패: ' + e.message, 'error');

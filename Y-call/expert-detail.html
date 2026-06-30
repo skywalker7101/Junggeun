@@ -137,6 +137,15 @@
               education: [], responseTime: '평균 5분',
               availableSlots: Array.isArray(d.availableSlots) ? d.availableSlots : [],
             };
+            // expertApplications에 슬롯이 없으면 users에서 fallback
+            if (!expert.availableSlots.length) {
+              try {
+                const usnap = await db.collection('users').doc(expertUid).get();
+                if (usnap.exists && Array.isArray(usnap.data().availableSlots)) {
+                  expert.availableSlots = usnap.data().availableSlots;
+                }
+              } catch(_) {}
+            }
           }
         } catch(e) { console.error(e); }
       } else {
