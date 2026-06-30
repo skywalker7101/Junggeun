@@ -522,22 +522,30 @@
       }
     }
 
-    async function saveSlots() {
-      const user = firebase.auth().currentUser;
-      if (!user) { showToast('로그인 후 다시 시도해주세요.', 'error'); return; }
-      const btn = document.getElementById('save-slots-btn');
+    function saveSlots() {
+      var user = firebase.auth().currentUser;
+      if (!user) { alert('로그인이 필요합니다.'); return; }
+      var btn = document.getElementById('save-slots-btn');
       btn.disabled = true;
       btn.textContent = '저장 중...';
-      const sorted = ALL_SLOTS.filter(function(s) { return _activeSlots.has(s); });
-      try {
-        await db.collection('users').doc(user.uid).set({ availableSlots: sorted }, { merge: true });
-        showToast('가능한 시간이 저장되었습니다.', 'success');
-      } catch(e) {
-        showToast('저장 실패: ' + e.message, 'error');
-      }
-      btn.disabled = false;
-      btn.textContent = '저장하기';
-      db.collection('expertApplications').doc(user.uid).set({ availableSlots: sorted }, { merge: true }).catch(function(){});
+      var sorted = [];
+      document.querySelectorAll('#avail-slots button').forEach(function(el) {
+        if (el.style.background === 'rgb(124, 58, 237)') {
+          sorted.push(el.textContent.trim());
+        }
+      });
+      db.collection('users').doc(user.uid).set({ availableSlots: sorted }, { merge: true })
+        .then(function() {
+          btn.disabled = false;
+          btn.textContent = '저장하기';
+          showToast('가능한 시간이 저장되었습니다.', 'success');
+          db.collection('expertApplications').doc(user.uid).set({ availableSlots: sorted }, { merge: true }).catch(function(){});
+        })
+        .catch(function(e) {
+          btn.disabled = false;
+          btn.textContent = '저장하기';
+          alert('저장 실패: ' + e.message);
+        });
     }
 
     function addTag(e) {
