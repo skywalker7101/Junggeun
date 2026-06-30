@@ -219,8 +219,8 @@
                 </div>`).join('')}
             </div>
             <div style="font-size:0.9375rem;font-weight:700;color:var(--gray-700);margin-bottom:10px;">예약 시간 선택</div>
-            <div class="time-slots">
-              ${expert.availableSlots.map(t=>`
+            <div class="time-slots" style="grid-template-columns:repeat(4,1fr);max-height:180px;overflow-y:auto;padding-right:4px;">
+              ${(()=>{const s=[];for(let h=8;h<=21;h++){s.push(`${String(h).padStart(2,'0')}:00`);if(h<21)s.push(`${String(h).padStart(2,'0')}:30`);}return s;})().map(t=>`
                 <div class="time-slot ${selectedTime===t?'selected':''}" onclick="selTime('${t}')">${t}</div>`).join('')}
             </div>
             <div class="booking-summary">
