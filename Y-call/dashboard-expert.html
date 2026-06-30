@@ -253,8 +253,12 @@
             </div>
           </div>
           <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:28px;">
-            <div style="font-size:1rem;font-weight:700;margin-bottom:16px;">가능한 시간 설정</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="avail-slots"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div style="font-size:1rem;font-weight:700;">가능한 시간 설정</div>
+              <button id="save-slots-btn" class="btn btn-primary btn-sm" onclick="saveSlots()">저장하기</button>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--gray-400);margin-bottom:14px;">열려는 시간대를 선택하세요. 선택된 시간만 고객에게 표시됩니다.</p>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="avail-slots"></div>
           </div>
         </div>
 
@@ -384,9 +388,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase.js?v=4"></script>
-  <script src="js/data.js?v=4"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/firebase.js?v=5"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
   <script>
     authReady.then(async user => {
       if (!user) { location.href = 'auth.html'; return; }
@@ -401,7 +405,7 @@
       document.getElementById('dash-name').textContent  = name;
       document.getElementById('dash-email').textContent = user.email || '';
       renderChart();
-      renderAvailSlots();
+      await renderAvailSlots(user.uid);
 
       // Load upcoming bookings where this expert is the target
       try {
@@ -440,13 +444,51 @@
       `).join('');
     }
 
-    function renderAvailSlots() {
-      const slots = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
-      const active = new Set(['09:00','10:00','14:00','15:00','16:00']);
+    let _slotsUid = null;
+    let _activeSlots = new Set();
+
+    const ALL_SLOTS = (()=>{
+      const s=[];
+      for(let h=8;h<=21;h++){
+        s.push(`${String(h).padStart(2,'0')}:00`);
+        if(h<21) s.push(`${String(h).padStart(2,'0')}:30`);
+      }
+      return s;
+    })();
+
+    async function renderAvailSlots(uid) {
+      _slotsUid = uid;
+      try {
+        const doc = await db.collection('expertApplications').doc(uid).get();
+        const saved = (doc.exists && Array.isArray(doc.data().availableSlots)) ? doc.data().availableSlots : [];
+        _activeSlots = new Set(saved);
+      } catch(e) { console.warn('슬롯 로드 실패:', e); }
+
       const el = document.getElementById('avail-slots');
-      el.innerHTML = slots.map(s => `
-        <div onclick="this.classList.toggle('selected')" class="duration-pill ${active.has(s)?'selected':''}" style="text-align:center;">${s}</div>
+      el.innerHTML = ALL_SLOTS.map(s => `
+        <div onclick="toggleSlot(this,'${s}')" class="duration-pill ${_activeSlots.has(s)?'selected':''}" style="text-align:center;font-size:0.8125rem;">${s}</div>
       `).join('');
+    }
+
+    function toggleSlot(el, slot) {
+      el.classList.toggle('selected');
+      if (_activeSlots.has(slot)) _activeSlots.delete(slot);
+      else _activeSlots.add(slot);
+    }
+
+    async function saveSlots() {
+      if (!_slotsUid) return;
+      const btn = document.getElementById('save-slots-btn');
+      btn.disabled = true; btn.textContent = '저장 중...';
+      try {
+        const sorted = ALL_SLOTS.filter(s => _activeSlots.has(s));
+        await saveExpertSlots(_slotsUid, sorted);
+        showToast('가능한 시간이 저장되었습니다.', 'success');
+      } catch(e) {
+        showToast('저장 실패: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = '저장하기';
+      }
     }
 
     function addTag(e) {
@@ -495,4 +537,5 @@
   </script>
 </body>
 </html>
+
 

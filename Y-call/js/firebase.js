@@ -106,9 +106,13 @@ async function getApprovedExperts() {
       career:         typeof d.career === 'string' ? d.career.split('\n').filter(Boolean) : [],
       education:      [],
       responseTime:   '평균 5분',
-      availableSlots: ['09:00', '10:00', '14:00', '15:00', '16:00'],
+      availableSlots: Array.isArray(d.availableSlots) ? d.availableSlots : [],
     };
   });
+}
+
+async function saveExpertSlots(uid, slots) {
+  await db.collection('expertApplications').doc(uid).set({ availableSlots: slots }, { merge: true });
 }
 
 // ===== EXPERT REGISTRATION =====

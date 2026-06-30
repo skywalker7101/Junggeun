@@ -104,9 +104,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://js.tosspayments.com/v1/payment"></script>
-  <script src="js/firebase.js?v=4"></script>
-  <script src="js/data.js?v=4"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/firebase.js?v=5"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
   <script>
     const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
 
@@ -135,7 +135,7 @@
               bio: d.bio || '',
               career: typeof d.career === 'string' ? d.career.split('\n').filter(Boolean) : [],
               education: [], responseTime: '평균 5분',
-              availableSlots: ['09:00', '10:00', '14:00', '15:00', '16:00'],
+              availableSlots: Array.isArray(d.availableSlots) ? d.availableSlots : [],
             };
           }
         } catch(e) { console.error(e); }
@@ -219,10 +219,13 @@
                 </div>`).join('')}
             </div>
             <div style="font-size:0.9375rem;font-weight:700;color:var(--gray-700);margin-bottom:10px;">예약 시간 선택</div>
-            <div class="time-slots" style="grid-template-columns:repeat(4,1fr);max-height:180px;overflow-y:auto;padding-right:4px;">
-              ${(()=>{const s=[];for(let h=8;h<=21;h++){s.push(`${String(h).padStart(2,'0')}:00`);if(h<21)s.push(`${String(h).padStart(2,'0')}:30`);}return s;})().map(t=>`
-                <div class="time-slot ${selectedTime===t?'selected':''}" onclick="selTime('${t}')">${t}</div>`).join('')}
-            </div>
+            ${(()=>{
+              const slots = (expert.availableSlots && expert.availableSlots.length)
+                ? expert.availableSlots
+                : (()=>{const s=[];for(let h=8;h<=21;h++){s.push(`${String(h).padStart(2,'0')}:00`);if(h<21)s.push(`${String(h).padStart(2,'0')}:30`);}return s;})();
+              if (!slots.length) return '<p style="font-size:0.875rem;color:var(--gray-400);text-align:center;padding:16px 0;">현재 예약 가능한 시간이 없습니다.<br>전문가에게 문의해주세요.</p>';
+              return `<div class="time-slots" style="grid-template-columns:repeat(4,1fr);max-height:180px;overflow-y:auto;padding-right:4px;">${slots.map(t=>`<div class="time-slot ${selectedTime===t?'selected':''}" onclick="selTime('${t}')">${t}</div>`).join('')}</div>`;
+            })()}
             <div class="booking-summary">
               <div class="booking-summary-row"><span>분당 요금</span><span>${formatPrice(expert.pricePerMin)}원</span></div>
               <div class="booking-summary-row"><span>통화 시간</span><span>${selectedDuration}분</span></div>
@@ -310,4 +313,5 @@
   </script>
 </body>
 </html>
+
 
